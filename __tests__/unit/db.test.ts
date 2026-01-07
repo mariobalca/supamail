@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getAliasWithUser, getRulesForAlias, logEmailActivity } from '../../lib/db';
-import { supabaseAdmin } from '../../lib/supabase/admin';
+import { getAliasWithUser, getRulesForAlias, logEmailActivity } from '@/lib/db';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
-vi.mock('../../lib/supabase/admin', () => {
+vi.mock('@/lib/supabase/admin', () => {
   const mockSupabase = {
     from: vi.fn().mockReturnThis(),
     select: vi.fn().mockReturnThis(),
@@ -15,7 +15,7 @@ vi.mock('../../lib/supabase/admin', () => {
   };
 });
 
-import { supabaseAdmin } from '../../lib/supabase/admin';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 describe('DB Service', () => {
   const mockSupabase = supabaseAdmin as any;

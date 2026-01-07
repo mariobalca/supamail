@@ -1,19 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { POST } from '../../app/api/inbound/route';
+import { POST } from '@/app/api/inbound/route';
 import { NextRequest } from 'next/server';
-import * as db from '../../lib/db';
-import * as mailgun from '../../lib/mailgun';
-import * as ai from '../../lib/ai';
+import * as db from '@/lib/db';
+import * as mailgun from '@/lib/mailgun';
+import * as ai from '@/lib/ai';
 
-vi.mock('../../lib/supabase/admin', () => ({
+vi.mock('@/lib/supabase/admin', () => ({
   supabaseAdmin: {
     from: vi.fn(),
   },
 }));
 
-vi.mock('../../lib/db');
-vi.mock('../../lib/mailgun');
-vi.mock('../../lib/ai');
+vi.mock('@/lib/db');
+vi.mock('@/lib/mailgun');
+vi.mock('@/lib/ai');
 
 describe('Inbound API Route', () => {
   beforeEach(() => {

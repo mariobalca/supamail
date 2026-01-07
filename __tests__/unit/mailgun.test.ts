@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { verifySignature } from '../../lib/mailgun';
+import { verifySignature } from '@/lib/mailgun';
 import crypto from 'crypto';
 
 describe('Mailgun Service', () => {

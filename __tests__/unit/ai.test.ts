@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { generateSmartSubject } from '../../lib/ai';
+import { generateSmartSubject } from '@/lib/ai';
 import OpenAI from 'openai';
 
 const mockCreate = vi.fn().mockResolvedValue({
