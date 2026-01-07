@@ -1,5 +1,5 @@
 import { createClient } from './supabase/client';
-import { Rule, Log, User } from '@/types/database';
+import { Rule, Log, User, RuleType, LogStatus } from '@/types/database';
 
 export const getProfile = async (): Promise<User | null> => {
   const supabase = createClient();
@@ -46,7 +46,8 @@ export const getAllRules = async (): Promise<Rule[]> => {
 
 export const createRule = async (
   pattern: string,
-  action: 'allow' | 'block'
+  action: 'allow' | 'block',
+  type: RuleType = 'domain'
 ) => {
   const supabase = createClient();
   const {
@@ -56,7 +57,7 @@ export const createRule = async (
 
   const { data, error } = await supabase
     .from('rules')
-    .insert({ user_id: user.id, pattern, action })
+    .insert({ user_id: user.id, pattern, action, type })
     .select()
     .single();
 

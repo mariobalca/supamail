@@ -36,13 +36,30 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Check Rules (Whitelist/Blacklist)
+    // 3. AI Feature: Generate Smart Subject/Summary and Category
+    const { summary, enhancedSubject, category } = await generateSmartSubject(
+      subject,
+      bodyPlain || bodyHtml
+    );
+
+    // 4. Check Rules (Whitelist/Blacklist/Category)
     const rules = await getRulesForUser(user.id);
 
-    // Simple matching logic
-    const isBlocked = rules?.some(
-      (rule: Rule) => rule.action === 'block' && sender.includes(rule.pattern)
-    );
+    // Advanced matching logic
+    const isBlocked = rules?.some((rule: Rule) => {
+      if (rule.action !== 'block') return false;
+
+      if (rule.type === 'category') {
+        return rule.pattern.toLowerCase() === category.toLowerCase();
+      }
+
+      if (rule.type === 'email') {
+        return sender.toLowerCase() === rule.pattern.toLowerCase();
+      }
+
+      // Default: domain matching
+      return sender.toLowerCase().includes(rule.pattern.toLowerCase());
+    });
 
     if (isBlocked) {
       await logEmailActivity({
@@ -50,15 +67,13 @@ export async function POST(req: NextRequest) {
         sender,
         subject,
         status: 'blocked',
+        ai_summary: summary,
+        category,
+        body_html: bodyHtml,
+        body_plain: bodyPlain,
       });
       return NextResponse.json({ message: 'Email blocked' });
     }
-
-    // 4. AI Feature: Generate Smart Subject/Summary
-    const { summary, enhancedSubject } = await generateSmartSubject(
-      subject,
-      bodyPlain || bodyHtml
-    );
 
     // 5. Forward Email via Mailgun
     await forwardEmail(
@@ -75,7 +90,10 @@ export async function POST(req: NextRequest) {
       sender,
       subject,
       ai_summary: summary,
+      category,
       status: 'forwarded',
+      body_html: bodyHtml,
+      body_plain: bodyPlain,
     });
 
     return NextResponse.json({ message: 'Email forwarded' });

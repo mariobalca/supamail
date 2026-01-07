@@ -13,7 +13,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { getAllRules, createRule, deleteRule, getProfile } from '@/lib/db';
-import { Rule, User } from '@/types/database';
+import { Rule, User, RuleType } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -35,6 +35,7 @@ export default function RulesPage() {
   // Form state
   const [pattern, setPattern] = useState('');
   const [action, setAction] = useState<'allow' | 'block'>('block');
+  const [type, setType] = useState<RuleType>('domain');
 
   useEffect(() => {
     fetchData();
@@ -61,7 +62,7 @@ export default function RulesPage() {
 
     setIsCreating(true);
     try {
-      await createRule(pattern, action);
+      await createRule(pattern, action, type);
       setPattern('');
       fetchData();
     } catch (error) {
@@ -116,11 +117,45 @@ export default function RulesPage() {
               <form onSubmit={handleCreateRule} className="space-y-4">
                 <div>
                   <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">
-                    Pattern (Email or Domain)
+                    Rule Type
+                  </label>
+                  <div className="flex gap-2">
+                    {(['domain', 'email', 'category'] as RuleType[]).map(
+                      (t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setType(t)}
+                          className={`flex-1 rounded-lg border px-3 py-1.5 text-[10px] font-bold transition-all ${
+                            type === t
+                              ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                              : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
+                          }`}
+                        >
+                          {t.charAt(0).toUpperCase() + t.slice(1)}
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                    {type === 'domain'
+                      ? 'Domain (e.g. amazon.com)'
+                      : type === 'email'
+                        ? 'Email Address'
+                        : 'Category Name'}
                   </label>
                   <Input
                     type="text"
-                    placeholder="e.g. spam-sender.com"
+                    placeholder={
+                      type === 'domain'
+                        ? 'e.g. news.google.com'
+                        : type === 'email'
+                          ? 'e.g. info@newsletter.com'
+                          : 'e.g. Promotions'
+                    }
                     value={pattern}
                     onChange={(e) => setPattern(e.target.value)}
                     disabled={isCreating}

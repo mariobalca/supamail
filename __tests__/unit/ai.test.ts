@@ -3,7 +3,16 @@ import { generateSmartSubject } from '@/lib/ai';
 import OpenAI from 'openai';
 
 const mockCreate = vi.fn().mockResolvedValue({
-  choices: [{ message: { content: 'Test Summary' } }],
+  choices: [
+    {
+      message: {
+        content: JSON.stringify({
+          summary: 'Test Summary',
+          category: 'Personal',
+        }),
+      },
+    },
+  ],
 });
 
 vi.mock('openai', () => {
@@ -21,13 +30,14 @@ vi.mock('openai', () => {
 });
 
 describe('AI Service', () => {
-  it('should generate an enhanced subject', async () => {
+  it('should generate an enhanced subject and category', async () => {
     const result = await generateSmartSubject(
       'Hello',
       'This is a test email body.'
     );
     expect(result.summary).toBe('Test Summary');
     expect(result.enhancedSubject).toBe('[Test Summary] Hello');
+    expect(result.category).toBe('Personal');
   });
 
   it('should handle AI errors gracefully', async () => {
@@ -39,5 +49,6 @@ describe('AI Service', () => {
     const result = await generateSmartSubject('Hello', 'Body');
     expect(result.summary).toBe('Summary unavailable');
     expect(result.enhancedSubject).toBe('[AI] Hello');
+    expect(result.category).toBe('Updates');
   });
 });

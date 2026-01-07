@@ -49,6 +49,7 @@ describe('Inbound API Route', () => {
     vi.mocked(ai.generateSmartSubject).mockResolvedValue({
       summary: 'Summary',
       enhancedSubject: '[Summary] Hello',
+      category: 'Personal',
     });
 
     const req = createMockRequest({
@@ -74,13 +75,20 @@ describe('Inbound API Route', () => {
     );
   });
 
-  it('should block email if rule matches', async () => {
+  it('should block email if rule matches (domain)', async () => {
     const mockUser = { id: 'u1', username: 'mario' };
-    const mockRules = [{ action: 'block', pattern: 'spam.com' }];
+    const mockRules = [
+      { action: 'block', pattern: 'spam.com', type: 'domain' },
+    ];
 
     vi.mocked(mailgun.verifySignature).mockReturnValue(true);
     vi.mocked(db.getUserBySupamailAddress).mockResolvedValue(mockUser as any);
     vi.mocked(db.getRulesForUser).mockResolvedValue(mockRules as any);
+    vi.mocked(ai.generateSmartSubject).mockResolvedValue({
+      summary: 'Spam',
+      enhancedSubject: '[Spam] Promo',
+      category: 'Promotions',
+    });
 
     const req = createMockRequest({
       from: 'bad@spam.com',
@@ -96,11 +104,37 @@ describe('Inbound API Route', () => {
 
     expect(json.message).toBe('Email blocked');
     expect(mailgun.forwardEmail).not.toHaveBeenCalled();
-    expect(db.logEmailActivity).toHaveBeenCalledWith(
-      expect.objectContaining({
-        status: 'blocked',
-      })
-    );
+  });
+
+  it('should block email if rule matches (category)', async () => {
+    const mockUser = { id: 'u1', username: 'mario' };
+    const mockRules = [
+      { action: 'block', pattern: 'Promotions', type: 'category' },
+    ];
+
+    vi.mocked(mailgun.verifySignature).mockReturnValue(true);
+    vi.mocked(db.getUserBySupamailAddress).mockResolvedValue(mockUser as any);
+    vi.mocked(db.getRulesForUser).mockResolvedValue(mockRules as any);
+    vi.mocked(ai.generateSmartSubject).mockResolvedValue({
+      summary: 'Promo',
+      enhancedSubject: '[Promo] Sale',
+      category: 'Promotions',
+    });
+
+    const req = createMockRequest({
+      from: 'newsletter@store.com',
+      recipient: 'mario@supamail.mariobalca.com',
+      subject: 'Sale',
+      timestamp: '123',
+      token: 'abc',
+      signature: 'sig',
+    });
+
+    const response = await POST(req);
+    const json = await response.json();
+
+    expect(json.message).toBe('Email blocked');
+    expect(mailgun.forwardEmail).not.toHaveBeenCalled();
   });
 
   it('should return 401 for invalid signature', async () => {

@@ -12,29 +12,36 @@ import { Button } from '@/components/ui/button';
 export default function LoginPage() {
   const supabase = createClient();
   const router = useRouter();
-  const [session, setSession] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session) {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      if (user) {
         router.push('/home');
       }
     });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
-        router.push('/home');
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        setUser(user);
+        if (user) {
+          router.push('/home');
+        }
+      } else {
+        setUser(null);
       }
     });
 
     return () => subscription.unsubscribe();
   }, [supabase, router]);
 
-  if (session) {
+  if (user) {
     return null;
   }
 

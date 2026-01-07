@@ -9,20 +9,29 @@ import {
   CheckCircle2,
   XCircle,
   ArrowRight,
+  Shield,
+  RotateCw,
+  Eye,
+  X,
 } from 'lucide-react';
-import { getLogs } from '@/lib/db';
-import { Log } from '@/types/database';
+import { getLogs, createRule } from '@/lib/db';
+import { Log, RuleType } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-
-type LogWithAlias = Log & { aliases: { address: string } };
+import {
+  Card,
+  CardContent,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 
 export default function LogsPage() {
-  const [logs, setLogs] = useState<LogWithAlias[]>([]);
+  const [logs, setLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [processingId, setProcessingId] = useState<string | null>(null);
+  const [selectedLog, setSelectedLog] = useState<Log | null>(null);
 
   useEffect(() => {
     fetchLogs();
@@ -31,7 +40,7 @@ export default function LogsPage() {
   const fetchLogs = async () => {
     try {
       const data = await getLogs();
-      setLogs(data as LogWithAlias[]);
+      setLogs(data);
     } catch (error) {
       console.error('Error fetching logs:', error);
     } finally {
@@ -39,11 +48,64 @@ export default function LogsPage() {
     }
   };
 
+  const handleForward = async (logId: string) => {
+    setProcessingId(logId);
+    try {
+      const res = await fetch('/api/forward-blocked', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ logId }),
+      });
+      if (res.ok) {
+        await fetchLogs();
+      } else {
+        const error = await res.json();
+        alert(error.error || 'Failed to forward email');
+      }
+    } catch (error) {
+      console.error('Forward error:', error);
+      alert('Network error. Please try again.');
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleWhitelist = async (
+    logId: string,
+    pattern: string,
+    type: RuleType
+  ) => {
+    setProcessingId(logId);
+    try {
+      await createRule(pattern, 'allow', type);
+      // After whitelisting, we might want to forward it too if it was blocked
+      const log = logs.find((l) => l.id === logId);
+      if (log?.status === 'blocked') {
+        // Wait for the forward to complete or show success
+        const res = await fetch('/api/forward-blocked', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ logId }),
+        });
+        if (!res.ok) {
+          const error = await res.json();
+          console.error('Auto-forward after whitelist failed:', error);
+        }
+      }
+      await fetchLogs();
+    } catch (error) {
+      console.error('Whitelist error:', error);
+      alert('Failed to whitelist. Please try again.');
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
   const filteredLogs = logs.filter(
     (log) =>
       log.sender.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.aliases?.address.toLowerCase().includes(searchTerm.toLowerCase())
+      log.category?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -119,13 +181,16 @@ export default function LogsPage() {
                       Status
                     </th>
                     <th className="px-5 py-3 text-[9px] font-black uppercase tracking-widest text-slate-400">
+                      Category
+                    </th>
+                    <th className="px-5 py-3 text-[9px] font-black uppercase tracking-widest text-slate-400">
                       Sender & Subject
                     </th>
                     <th className="px-5 py-3 text-[9px] font-black uppercase tracking-widest text-slate-400">
-                      Supamail ID
+                      AI Summary
                     </th>
                     <th className="px-5 py-3 text-[9px] font-black uppercase tracking-widest text-slate-400">
-                      AI Summary
+                      Actions
                     </th>
                     <th className="px-5 py-3 text-right text-[9px] font-black uppercase tracking-widest text-slate-400">
                       Time
@@ -150,6 +215,14 @@ export default function LogsPage() {
                         </div>
                       </td>
                       <td className="px-5 py-4">
+                        <Badge
+                          variant="outline"
+                          className="border-slate-200 bg-slate-50 text-slate-600"
+                        >
+                          {log.category || 'Updates'}
+                        </Badge>
+                      </td>
+                      <td className="px-5 py-4">
                         <div className="flex max-w-xs flex-col gap-0.5">
                           <div className="flex items-center gap-2">
                             <span className="truncate text-xs font-black text-slate-900">
@@ -159,12 +232,6 @@ export default function LogsPage() {
                           <span className="line-clamp-1 text-[10px] font-medium text-slate-500">
                             {log.subject || '(No Subject)'}
                           </span>
-                        </div>
-                      </td>
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-1.5 text-indigo-600">
-                          <Mail size={12} className="opacity-50" />
-                          <span className="text-[10px] font-bold">To: ID</span>
                         </div>
                       </td>
                       <td className="px-5 py-4">
@@ -180,6 +247,51 @@ export default function LogsPage() {
                             N/A
                           </span>
                         )}
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          {log.status === 'blocked' && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2 text-[10px]"
+                              disabled={processingId === log.id}
+                              onClick={() => handleForward(log.id)}
+                            >
+                              {processingId === log.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <RotateCw className="mr-1 h-3 w-3" />
+                              )}
+                              Forward
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-[10px] hover:text-indigo-600"
+                            onClick={() => setSelectedLog(log)}
+                          >
+                            <Eye className="mr-1 h-3 w-3" />
+                            View
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-[10px] hover:text-indigo-600"
+                            disabled={processingId === log.id}
+                            onClick={() =>
+                              handleWhitelist(
+                                log.id,
+                                log.sender.split('@')[1],
+                                'domain'
+                              )
+                            }
+                          >
+                            <Shield className="mr-1 h-3 w-3" />
+                            Trust Domain
+                          </Button>
+                        </div>
                       </td>
                       <td className="px-5 py-4 text-right">
                         <div className="flex flex-col items-end gap-0.5">
@@ -239,6 +351,44 @@ export default function LogsPage() {
           <div className="absolute bottom-0 right-0 h-48 w-48 rounded-full bg-white/10 blur-[80px]" />
         </Card>
       </div>
+
+      {selectedLog && (
+        <EmailModal log={selectedLog} onClose={() => setSelectedLog(null)} />
+      )}
+    </div>
+  );
+}
+
+function EmailModal({ log, onClose }: { log: Log; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
+      <Card className="flex h-full max-h-[80vh] w-full max-w-4xl flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between border-b border-slate-100 p-4">
+          <div>
+            <CardTitle className="text-base">{log.subject || '(No Subject)'}</CardTitle>
+            <CardDescription className="text-xs">From: {log.sender}</CardDescription>
+          </div>
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-slate-400 hover:text-slate-900">
+            <X size={18} />
+          </Button>
+        </div>
+        <CardContent className="flex-1 overflow-auto p-0">
+          {log.body_html ? (
+            <iframe
+              srcDoc={log.body_html}
+              className="h-full w-full bg-white"
+              title="Email Content"
+            />
+          ) : (
+            <div className="whitespace-pre-wrap p-6 text-sm font-medium text-slate-600">
+              {log.body_plain || 'No content available.'}
+            </div>
+          )}
+        </CardContent>
+        <div className="flex items-center justify-end border-t border-slate-100 p-4">
+          <Button variant="outline" onClick={onClose}>Close</Button>
+        </div>
+      </Card>
     </div>
   );
 }

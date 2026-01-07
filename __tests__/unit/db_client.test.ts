@@ -102,6 +102,7 @@ describe('Client DB Service', () => {
         user_id: 'u1',
         pattern: 'spam.com',
         action: 'block',
+        type: 'domain',
       });
     });
 

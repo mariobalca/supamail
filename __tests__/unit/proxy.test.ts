@@ -11,7 +11,7 @@ import { createServerClient } from '@supabase/ssr';
 describe('Proxy Middleware', () => {
   const mockSupabase = {
     auth: {
-      getSession: vi.fn(),
+      getUser: vi.fn(),
     },
     from: vi.fn().mockReturnThis(),
     select: vi.fn().mockReturnThis(),
@@ -29,7 +29,7 @@ describe('Proxy Middleware', () => {
   };
 
   it('redirects unauthenticated users to login for app pages', async () => {
-    mockSupabase.auth.getSession.mockResolvedValue({ data: { session: null } });
+    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: null } });
     const req = createRequest('/home');
     const res = await proxy(req);
     expect(res?.status).toBe(307);
@@ -37,8 +37,8 @@ describe('Proxy Middleware', () => {
   });
 
   it('redirects authenticated users without username to onboarding', async () => {
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'u1' } } }
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'u1' } }
     });
     mockSupabase.single.mockResolvedValue({ data: { username: null } });
 
@@ -49,8 +49,8 @@ describe('Proxy Middleware', () => {
   });
 
   it('redirects authenticated users with username away from onboarding', async () => {
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'u1' } } }
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'u1' } }
     });
     mockSupabase.single.mockResolvedValue({ data: { username: 'mario' } });
 
@@ -61,8 +61,8 @@ describe('Proxy Middleware', () => {
   });
 
   it('allows access to app pages if authenticated and has username', async () => {
-    mockSupabase.auth.getSession.mockResolvedValue({
-      data: { session: { user: { id: 'u1' } } }
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'u1' } }
     });
     mockSupabase.single.mockResolvedValue({ data: { username: 'mario' } });
 

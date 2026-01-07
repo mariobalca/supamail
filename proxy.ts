@@ -35,7 +35,7 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  const { data: { session } } = await supabase.auth.getSession()
+  const { data: { user } } = await supabase.auth.getUser()
 
   const isHomePage = request.nextUrl.pathname.startsWith('/home')
   const isOnboardingPage = request.nextUrl.pathname.startsWith('/onboarding')
@@ -45,16 +45,16 @@ export async function proxy(request: NextRequest) {
 
   const isProtectedRoute = isHomePage || isOnboardingPage || isSettingsPage || isRulesPage || isLogsPage
 
-  if (!session && isProtectedRoute && !isOnboardingPage) {
+  if (!user && isProtectedRoute && !isOnboardingPage) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  if (session && (isHomePage || isSettingsPage || isRulesPage || isLogsPage)) {
+  if (user && (isHomePage || isSettingsPage || isRulesPage || isLogsPage)) {
     // Check if user has a username
     const { data: profile } = await supabase
       .from('users')
       .select('username')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single()
 
     if (!profile?.username) {
@@ -62,12 +62,12 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  if (session && isOnboardingPage) {
+  if (user && isOnboardingPage) {
     // If they already have a username, don't let them go back to onboarding
     const { data: profile } = await supabase
       .from('users')
       .select('username')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single()
 
     if (profile?.username) {
