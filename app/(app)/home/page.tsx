@@ -112,7 +112,7 @@ export default function DashboardPage() {
         </div>
         <div className="flex items-center gap-3">
           <Button variant="primary" asChild className="group">
-            <Link href="/dashboard/id">
+            <Link href="/id">
               <UserIcon
                 size={18}
                 className="mr-2 transition-transform group-hover:scale-110"

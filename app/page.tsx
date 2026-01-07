@@ -100,7 +100,7 @@ export default function LandingPage() {
                   className="w-full sm:w-auto"
                   asChild
                 >
-                  <Link href="/dashboard">Explore Dashboard</Link>
+                  <Link href="/home">Explore Dashboard</Link>
                 </Button>
               </div>
 

@@ -37,13 +37,9 @@ export async function proxy(request: NextRequest) {
 
   const { data: { session } } = await supabase.auth.getSession()
 
-  if (!session && request.nextUrl.pathname.startsWith('/dashboard')) {
+  if (!session && request.nextUrl.pathname.startsWith('/home')) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
   return response
 }
-
-export const config = {
-  matcher: ['/dashboard/:path*'],
-};

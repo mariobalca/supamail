@@ -34,10 +34,10 @@ export default function DashboardLayout({
   };
 
   const navItems = [
-    { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Supamail ID', href: '/dashboard/id', icon: Mail },
-    { name: 'Rules', href: '/dashboard/rules', icon: Shield },
-    { name: 'Activity', href: '/dashboard/logs', icon: History },
+    { name: 'Overview', href: '/home', icon: LayoutDashboard },
+    { name: 'Supamail ID', href: '/id', icon: Mail },
+    { name: 'Rules', href: '/rules', icon: Shield },
+    { name: 'Activity', href: '/logs', icon: History },
   ];
 
   return (
@@ -47,7 +47,7 @@ export default function DashboardLayout({
         className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col`}
       >
         <div className="flex items-center justify-between p-6">
-          <Link href="/dashboard" className="group flex items-center gap-2">
+          <Link href="/home" className="group flex items-center gap-2">
             <div className="rounded-lg bg-indigo-600 p-1.5 shadow-lg shadow-indigo-100 transition-all duration-300 group-hover:rotate-12">
               <Mail className="h-4 w-4 text-white" />
             </div>
@@ -115,49 +115,6 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <main className="relative flex flex-1 flex-col overflow-y-auto">
-        {/* Top Header */}
-        <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/60 bg-white/80 px-6 backdrop-blur-md md:px-8">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="text-slate-500 hover:text-slate-900 md:hidden"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
-            <div className="group hidden w-64 items-center gap-2.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 transition-all focus-within:border-indigo-300 md:flex">
-              <Search className="h-3.5 w-3.5 text-slate-400 group-focus-within:text-indigo-500" />
-              <Input
-                type="text"
-                placeholder="Search aliases..."
-                className="h-auto w-full border-none bg-transparent p-0 text-xs font-medium placeholder:text-slate-400 focus:ring-0"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 md:gap-5">
-            <button className="relative rounded-lg p-2 text-slate-400 transition-all hover:bg-indigo-50 hover:text-indigo-600">
-              <Bell className="h-4 w-4" />
-              <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full border border-white bg-rose-500" />
-            </button>
-            <div className="h-6 w-px bg-slate-200" />
-            <div className="flex items-center gap-2.5 pl-1">
-              <div className="hidden text-right sm:block">
-                <p className="mb-0.5 text-xs font-bold leading-none text-slate-900">
-                  User Name
-                </p>
-                <p className="text-[9px] font-bold uppercase leading-none tracking-widest text-indigo-600">
-                  Pro Plan
-                </p>
-              </div>
-              <div className="group flex h-8 w-8 cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-indigo-200 bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-100">
-                <span className="text-xs font-black uppercase text-white transition-transform group-hover:scale-110">
-                  U
-                </span>
-              </div>
-            </div>
-          </div>
-        </header>
-
         <div className="mx-auto w-full max-w-7xl p-5 md:p-8">{children}</div>
       </main>
 

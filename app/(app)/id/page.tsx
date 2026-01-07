@@ -154,7 +154,7 @@ export default function SupamailIDPage() {
               className="group transition-all hover:border-indigo-100 hover:shadow-xl"
               asChild
             >
-              <Link href="/dashboard/rules">
+              <Link href="/rules">
                 <CardContent className="p-6">
                   <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 transition-transform group-hover:scale-110">
                     <Shield size={20} />
@@ -176,7 +176,7 @@ export default function SupamailIDPage() {
               className="group transition-all hover:border-indigo-100 hover:shadow-xl"
               asChild
             >
-              <Link href="/dashboard/logs">
+              <Link href="/logs">
                 <CardContent className="p-6">
                   <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition-transform group-hover:scale-110">
                     <History size={20} />

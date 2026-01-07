@@ -18,7 +18,7 @@ export default function LoginPage() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) {
-        router.push('/dashboard');
+        router.push('/home');
       }
     });
 
@@ -27,7 +27,7 @@ export default function LoginPage() {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session) {
-        router.push('/dashboard');
+        router.push('/home');
       }
     });
 

@@ -17,7 +17,7 @@ async function simulateInbound() {
     .digest('hex');
 
   const formData = new URLSearchParams();
-  formData.append('from', 'sender@example.com');
+  formData.append('from', 'no-reply@supamail.mariobalca.com');
   formData.append('recipient', 'mariobalca@supamail.mariobalca.com');
   formData.append('subject', 'Test Email');
   formData.append(
