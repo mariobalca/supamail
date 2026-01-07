@@ -9,26 +9,18 @@ export function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
     {
       cookies: {
-        async get(name: string) {
+        async getAll() {
           const store = await cookieStore
-          return store.get(name)?.value
+          return store.getAll()
         },
-        async set(name: string, value: string, options: CookieOptions) {
+        async setAll(cookiesToSet) {
           try {
             const store = await cookieStore
-            store.set({ name, value, ...options })
+            cookiesToSet.forEach(({ name, value, options }) =>
+              store.set({ name, value, ...options })
+            )
           } catch (error) {
-            // The `set` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
-          }
-        },
-        async remove(name: string, options: CookieOptions) {
-          try {
-            const store = await cookieStore
-            store.set({ name, value: '', ...options })
-          } catch (error) {
-            // The `remove` method was called from a Server Component.
+            // The `setAll` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
             // user sessions.
           }
