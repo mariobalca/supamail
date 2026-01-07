@@ -40,7 +40,7 @@ describe('Inbound API Route', () => {
     const mockAlias = {
       id: '1',
       address: 'alias@tool.com',
-      users: { primary_email: 'real@email.com' }
+      users: { email: 'real@email.com' }
     };
 
     vi.mocked(mailgun.verifySignature).mockReturnValue(true);

@@ -2,7 +2,6 @@
 CREATE TABLE public.users (
   id uuid REFERENCES auth.users ON DELETE CASCADE NOT NULL PRIMARY KEY,
   email text UNIQUE NOT NULL,
-  primary_email text NOT NULL,
   updated_at timestamp with time zone DEFAULT now()
 );
 

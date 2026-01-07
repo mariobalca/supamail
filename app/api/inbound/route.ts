@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     // 5. Forward Email via Mailgun
     await forwardEmail(
-      alias.users.primary_email,
+      alias.users.email,
       sender,
       enhancedSubject,
       bodyHtml,

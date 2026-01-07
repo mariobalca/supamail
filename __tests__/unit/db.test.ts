@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getAliasWithUser, getRulesForAlias, logEmailActivity } from '@/lib/db';
-import { supabaseAdmin } from '@/lib/supabase/admin';
 
 vi.mock('@/lib/supabase/admin', () => {
   const mockSupabase = {
@@ -29,7 +28,7 @@ describe('DB Service', () => {
 
   describe('getAliasWithUser', () => {
     it('should return alias if found', async () => {
-      const mockAlias = { id: '1', address: 'test@tool.com', users: { primary_email: 'real@email.com' } };
+      const mockAlias = { id: '1', address: 'test@tool.com', users: { email: 'real@email.com' } };
       mockSupabase.single.mockResolvedValueOnce({ data: mockAlias, error: null } as any);
 
       const result = await getAliasWithUser('test@tool.com');
