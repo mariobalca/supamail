@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { verifySignature } from '@/lib/mailgun';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 describe('Mailgun Service', () => {
   describe('verifySignature', () => {

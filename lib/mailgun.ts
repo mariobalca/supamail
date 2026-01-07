@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import FormData from 'form-data';
 import Mailgun from 'mailgun.js';
 import { ForwardEmailResult } from '@/types/mailgun';

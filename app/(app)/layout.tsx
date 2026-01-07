@@ -9,8 +9,7 @@ import {
   LogOut,
   LayoutDashboard,
   Menu,
-  Bell,
-  Search,
+  Settings,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -35,9 +34,9 @@ export default function DashboardLayout({
 
   const navItems = [
     { name: 'Overview', href: '/home', icon: LayoutDashboard },
-    { name: 'Supamail ID', href: '/id', icon: Mail },
     { name: 'Rules', href: '/rules', icon: Shield },
     { name: 'Activity', href: '/logs', icon: History },
+    { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
   return (
