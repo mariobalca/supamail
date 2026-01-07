@@ -62,10 +62,10 @@ export default function LoginPage() {
               <Mail className="h-6 w-6 text-white" />
             </div>
             <h1 className="mb-2 text-3xl font-black tracking-tight text-slate-900">
-              Welcome back.
+              Welcome to Supamail.
             </h1>
             <p className="font-medium text-slate-500">
-              Log in to manage your secure aliases and filters.
+              Sign in to manage your AI firewall and protected identity.
             </p>
           </div>
 
@@ -118,7 +118,7 @@ export default function LoginPage() {
           </h2>
           <p className="mx-auto max-w-md text-lg font-medium leading-relaxed text-slate-400">
             Join thousands of users who have taken back control of their primary
-            inbox using AI-powered filters.
+            inbox using an AI-powered personal firewall.
           </p>
         </div>
 

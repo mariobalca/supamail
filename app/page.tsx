@@ -74,13 +74,13 @@ export default function LandingPage() {
               <h1 className="mb-6 text-4xl font-black leading-[1.1] tracking-tight text-slate-900 md:text-6xl lg:text-7xl">
                 Own your inbox. <br />
                 <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
-                  Defeat the noise.
+                  AI-Powered Privacy.
                 </span>
               </h1>
               <p className="mx-auto mb-10 max-w-xl text-base font-medium leading-relaxed text-slate-500 md:text-lg">
-                Create secure aliases for every service. Filter unwanted senders
-                with ease and get AI-powered insights before you even open an
-                email.
+                Claim your unique Supamail ID and protect your primary email.
+                Intelligent AI categorization and advanced filtering give you
+                total control over your digital identity.
               </p>
               <div className="flex w-full flex-col items-center justify-center gap-4 sm:w-auto sm:flex-row">
                 <Button
@@ -90,7 +90,7 @@ export default function LandingPage() {
                   asChild
                 >
                   <Link href="/login">
-                    Create Your First Alias
+                    Claim Your Supamail ID
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
@@ -146,20 +146,20 @@ export default function LandingPage() {
             <div className="grid gap-6 md:grid-cols-3">
               {[
                 {
-                  title: 'Alias Management',
-                  desc: 'Generate unique, secure email addresses for every site. Keep your real identity private.',
+                  title: 'Supamail ID',
+                  desc: 'One unique identity for your entire digital life. Keep your personal email address truly private.',
                   icon: Shield,
                   color: 'bg-blue-50 text-blue-600',
                 },
                 {
                   title: 'AI Smart-Digest',
-                  desc: 'Get a 3-5 word summary of every email. See the urgency at a glance in your main inbox.',
+                  desc: 'Automatic categorization and 3-5 word summaries for every email. See what matters instantly.',
                   icon: Sparkles,
                   color: 'bg-indigo-50 text-indigo-600',
                 },
                 {
                   title: 'Advanced Filtering',
-                  desc: 'Block domains or specific senders with one click. Granular rules for total silence.',
+                  desc: 'Block by email, domain, or AI category. Specific rules ensure only what you want gets through.',
                   icon: Filter,
                   color: 'bg-violet-50 text-violet-600',
                 },
