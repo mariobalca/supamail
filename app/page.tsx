@@ -1,36 +1,62 @@
 import Link from 'next/link';
-import { Mail, Shield, Zap, CheckCircle2, ArrowRight, Github, Twitter, Lock, Sparkles, Filter } from 'lucide-react';
+import {
+  Mail,
+  Shield,
+  Zap,
+  ArrowRight,
+  Github,
+  Twitter,
+  Lock,
+  Sparkles,
+  Filter,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-[#fafafa] text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="flex min-h-screen flex-col bg-[#fafafa] text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
       {/* Navigation */}
-      <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/60">
-        <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full">
-          <div className="flex items-center gap-2.5 group cursor-pointer">
-            <div className="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-200 group-hover:scale-105 transition-all duration-300">
-              <Mail className="text-white w-5 h-5" />
+      <header className="fixed top-0 z-50 w-full border-b border-slate-200/60 bg-white/80 backdrop-blur-md">
+        <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
+          <div className="group flex cursor-pointer items-center gap-2.5">
+            <div className="rounded-xl bg-indigo-600 p-2 shadow-lg shadow-indigo-200 transition-all duration-300 group-hover:scale-105">
+              <Mail className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">
+            <span className="bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-xl font-bold tracking-tight text-transparent">
               Supamail
             </span>
           </div>
           <div className="flex items-center gap-8">
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors">Features</a>
-              <a href="#how-it-works" className="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors">How it works</a>
+            <div className="hidden items-center gap-8 md:flex">
+              <a
+                href="#features"
+                className="text-sm font-medium text-slate-500 transition-colors hover:text-indigo-600"
+              >
+                Features
+              </a>
+              <a
+                href="#how-it-works"
+                className="text-sm font-medium text-slate-500 transition-colors hover:text-indigo-600"
+              >
+                How it works
+              </a>
             </div>
-            <div className="h-4 w-px bg-slate-200 hidden md:block" />
+            <div className="hidden h-4 w-px bg-slate-200 md:block" />
             <div className="flex items-center gap-4">
-              <Link href="/login" className="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors">
-                Sign in
-              </Link>
               <Link
                 href="/login"
-                className="text-sm font-semibold bg-slate-900 text-white px-5 py-2.5 rounded-full hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 active:scale-95"
+                className="text-sm font-semibold text-slate-600 transition-colors hover:text-indigo-600"
               >
-                Get Started
+                Sign in
               </Link>
+              <Button
+                variant="secondary"
+                size="md"
+                className="rounded-full"
+                asChild
+              >
+                <Link href="/login">Get Started</Link>
+              </Button>
             </div>
           </div>
         </nav>
@@ -38,49 +64,59 @@ export default function LandingPage() {
 
       <main className="flex-1 pt-32">
         {/* Hero Section */}
-        <section className="relative px-6 pb-24 overflow-hidden">
-          <div className="max-w-7xl mx-auto relative z-10">
+        <section className="relative overflow-hidden px-6 pb-24">
+          <div className="relative z-10 mx-auto max-w-7xl">
             <div className="flex flex-col items-center text-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold uppercase tracking-widest mb-8 animate-fade-in">
-                <Sparkles className="w-3.5 h-3.5" />
+              <div className="animate-fade-in mb-8 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-indigo-600">
+                <Sparkles className="h-3.5 w-3.5" />
                 Now with AI Smart-Digest
               </div>
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6 text-slate-900 leading-[1.1]">
+              <h1 className="mb-6 text-4xl font-black leading-[1.1] tracking-tight text-slate-900 md:text-6xl lg:text-7xl">
                 Own your inbox. <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
+                <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
                   Defeat the noise.
                 </span>
               </h1>
-              <p className="text-base md:text-lg text-slate-500 mb-10 leading-relaxed max-w-xl mx-auto font-medium">
-                Create secure aliases for every service. Filter unwanted senders with ease and get AI-powered insights before you even open an email.
+              <p className="mx-auto mb-10 max-w-xl text-base font-medium leading-relaxed text-slate-500 md:text-lg">
+                Create secure aliases for every service. Filter unwanted senders
+                with ease and get AI-powered insights before you even open an
+                email.
               </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-                <Link
-                  href="/login"
-                  className="w-full sm:w-auto px-6 py-4 bg-indigo-600 text-white rounded-xl font-bold text-base hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 flex items-center justify-center gap-2 group active:scale-[0.98]"
+              <div className="flex w-full flex-col items-center justify-center gap-4 sm:w-auto sm:flex-row">
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="group w-full sm:w-auto"
+                  asChild
                 >
-                  Create Your First Alias
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  href="/dashboard"
-                  className="w-full sm:w-auto px-6 py-4 bg-white text-slate-900 border border-slate-200 rounded-xl font-bold text-base hover:bg-slate-50 transition-all flex items-center justify-center gap-2 shadow-sm active:scale-[0.98]"
+                  <Link href="/login">
+                    Create Your First Alias
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full sm:w-auto"
+                  asChild
                 >
-                  Explore Dashboard
-                </Link>
+                  <Link href="/dashboard">Explore Dashboard</Link>
+                </Button>
               </div>
 
               {/* Trust Indicators */}
-              <div className="mt-20 pt-10 border-t border-slate-200 w-full max-w-4xl grid grid-cols-2 md:grid-cols-4 gap-8">
+              <div className="mt-20 grid w-full max-w-4xl grid-cols-2 gap-8 border-t border-slate-200 pt-10 md:grid-cols-4">
                 {[
-                  { label: "Encrypted", icon: Lock },
-                  { label: "AI Powered", icon: Sparkles },
-                  { label: "Spam Free", icon: Shield },
-                  { label: "Fast Setup", icon: Zap }
+                  { label: 'Encrypted', icon: Lock },
+                  { label: 'AI Powered', icon: Sparkles },
+                  { label: 'Spam Free', icon: Shield },
+                  { label: 'Fast Setup', icon: Zap },
                 ].map((item, i) => (
                   <div key={i} className="flex flex-col items-center gap-2">
-                    <item.icon className="w-5 h-5 text-slate-400" />
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter">{item.label}</span>
+                    <item.icon className="h-5 w-5 text-slate-400" />
+                    <span className="text-xs font-bold uppercase tracking-tighter text-slate-400">
+                      {item.label}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -88,47 +124,59 @@ export default function LandingPage() {
           </div>
 
           {/* Abstract background shapes */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 pointer-events-none overflow-hidden">
-            <div className="absolute top-[-10%] left-[-20%] w-[60%] h-[60%] bg-indigo-100/50 blur-[120px] rounded-full animate-pulse" />
-            <div className="absolute bottom-[-10%] right-[-20%] w-[60%] h-[60%] bg-violet-100/50 blur-[120px] rounded-full animate-pulse transition-all duration-1000" />
+          <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-full w-full -translate-x-1/2 overflow-hidden">
+            <div className="absolute left-[-20%] top-[-10%] h-[60%] w-[60%] animate-pulse rounded-full bg-indigo-100/50 blur-[120px]" />
+            <div className="absolute bottom-[-10%] right-[-20%] h-[60%] w-[60%] animate-pulse rounded-full bg-violet-100/50 blur-[120px] transition-all duration-1000" />
           </div>
         </section>
 
         {/* Features Section */}
-        <section id="features" className="py-32 bg-white relative">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-20">
-              <h2 className="text-sm font-bold text-indigo-600 uppercase tracking-[0.2em] mb-4">Features</h2>
-              <h3 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">Everything you need to <br />take back control.</h3>
+        <section id="features" className="relative bg-white py-32">
+          <div className="mx-auto max-w-7xl px-6">
+            <div className="mb-20 text-center">
+              <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-indigo-600">
+                Features
+              </h2>
+              <h3 className="text-4xl font-black tracking-tight text-slate-900 md:text-5xl">
+                Everything you need to <br />
+                take back control.
+              </h3>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid gap-6 md:grid-cols-3">
               {[
                 {
-                  title: "Alias Management",
-                  desc: "Generate unique, secure email addresses for every site. Keep your real identity private.",
+                  title: 'Alias Management',
+                  desc: 'Generate unique, secure email addresses for every site. Keep your real identity private.',
                   icon: Shield,
-                  color: "bg-blue-50 text-blue-600"
+                  color: 'bg-blue-50 text-blue-600',
                 },
                 {
-                  title: "AI Smart-Digest",
-                  desc: "Get a 3-5 word summary of every email. See the urgency at a glance in your main inbox.",
+                  title: 'AI Smart-Digest',
+                  desc: 'Get a 3-5 word summary of every email. See the urgency at a glance in your main inbox.',
                   icon: Sparkles,
-                  color: "bg-indigo-50 text-indigo-600"
+                  color: 'bg-indigo-50 text-indigo-600',
                 },
                 {
-                  title: "Advanced Filtering",
-                  desc: "Block domains or specific senders with one click. Granular rules for total silence.",
+                  title: 'Advanced Filtering',
+                  desc: 'Block domains or specific senders with one click. Granular rules for total silence.',
                   icon: Filter,
-                  color: "bg-violet-50 text-violet-600"
-                }
+                  color: 'bg-violet-50 text-violet-600',
+                },
               ].map((feat, i) => (
-                <div key={i} className="group p-6 rounded-2xl bg-slate-50 border border-transparent hover:border-indigo-100 hover:bg-white hover:shadow-2xl hover:shadow-indigo-100/50 transition-all duration-500">
-                  <div className={`w-12 h-12 ${feat.color} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500`}>
-                    <feat.icon className="w-6 h-6" />
+                <div
+                  key={i}
+                  className="group rounded-2xl border border-transparent bg-slate-50 p-6 transition-all duration-500 hover:border-indigo-100 hover:bg-white hover:shadow-2xl hover:shadow-indigo-100/50"
+                >
+                  <div
+                    className={`h-12 w-12 ${feat.color} mb-6 flex items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110`}
+                  >
+                    <feat.icon className="h-6 w-6" />
                   </div>
-                  <h4 className="text-xl font-bold mb-3 text-slate-900">{feat.title}</h4>
-                  <p className="text-slate-500 text-sm leading-relaxed font-medium">
+                  <h4 className="mb-3 text-xl font-bold text-slate-900">
+                    {feat.title}
+                  </h4>
+                  <p className="text-sm font-medium leading-relaxed text-slate-500">
                     {feat.desc}
                   </p>
                 </div>
@@ -138,44 +186,61 @@ export default function LandingPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 px-6">
-          <div className="max-w-5xl mx-auto rounded-[2rem] bg-slate-900 p-10 md:p-16 text-center relative overflow-hidden shadow-2xl">
+        <section className="px-6 py-20">
+          <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] bg-slate-900 p-10 text-center shadow-2xl md:p-16">
             <div className="relative z-10">
-              <h2 className="text-2xl md:text-4xl font-black text-white mb-6 tracking-tight leading-tight">
-                Ready to make your primary <br className="hidden md:block" />email private again?
+              <h2 className="mb-6 text-2xl font-black leading-tight tracking-tight text-white md:text-4xl">
+                Ready to make your primary <br className="hidden md:block" />
+                email private again?
               </h2>
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-slate-900 rounded-xl font-bold text-lg hover:bg-slate-100 transition-all active:scale-95"
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-none bg-white text-slate-900 hover:bg-slate-100"
+                asChild
               >
-                Join Supamail Now
-                <ArrowRight className="w-5 h-5" />
-              </Link>
+                <Link href="/login">
+                  Join Supamail Now
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
             </div>
             {/* Background elements for CTA */}
-            <div className="absolute top-0 left-0 w-full h-full opacity-20">
-              <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[100%] bg-indigo-500 blur-[100px] rounded-full" />
-              <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[100%] bg-violet-500 blur-[100px] rounded-full" />
+            <div className="absolute left-0 top-0 h-full w-full opacity-20">
+              <div className="absolute left-[-10%] top-[-20%] h-[100%] w-[50%] rounded-full bg-indigo-500 blur-[100px]" />
+              <div className="absolute bottom-[-20%] right-[-10%] h-[100%] w-[50%] rounded-full bg-violet-500 blur-[100px]" />
             </div>
           </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="py-16 border-t border-slate-200 bg-white">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8">
+      <footer className="border-t border-slate-200 bg-white py-16">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 px-6 md:flex-row">
           <div className="flex items-center gap-2.5">
-            <div className="bg-slate-900 p-1.5 rounded-lg">
-              <Mail className="text-white w-4 h-4" />
+            <div className="rounded-lg bg-slate-900 p-1.5">
+              <Mail className="h-4 w-4 text-white" />
             </div>
-            <span className="text-lg font-bold tracking-tight text-slate-900">Supamail</span>
+            <span className="text-lg font-bold tracking-tight text-slate-900">
+              Supamail
+            </span>
           </div>
-          <p className="text-slate-400 font-medium text-sm">
+          <p className="text-sm font-medium text-slate-400">
             © 2026 Supamail. Built with speed and precision.
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="text-slate-400 hover:text-slate-900 transition-colors"><Twitter className="w-5 h-5" /></a>
-            <a href="#" className="text-slate-400 hover:text-slate-900 transition-colors"><Github className="w-5 h-5" /></a>
+            <a
+              href="#"
+              className="text-slate-400 transition-colors hover:text-slate-900"
+            >
+              <Twitter className="h-5 w-5" />
+            </a>
+            <a
+              href="#"
+              className="text-slate-400 transition-colors hover:text-slate-900"
+            >
+              <Github className="h-5 w-5" />
+            </a>
           </div>
         </div>
       </footer>

@@ -1,7 +1,9 @@
 import { supabaseAdmin } from './supabase/admin';
 import { User, Rule, LogStatus } from '@/types/database';
 
-export const getUserBySupamailAddress = async (address: string): Promise<User | null> => {
+export const getUserBySupamailAddress = async (
+  address: string
+): Promise<User | null> => {
   const domain = process.env.MAILGUN_DOMAIN || 'supamail.mariobalca.com';
   if (address.endsWith(`@${domain}`)) {
     const username = address.split('@')[0];

@@ -1,10 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mail, Loader2, User as UserIcon, Check, Shield, History, ArrowRight } from 'lucide-react';
+import {
+  Loader2,
+  User as UserIcon,
+  Check,
+  Shield,
+  History,
+  ArrowRight,
+} from 'lucide-react';
 import { getProfile, updateUsername } from '@/lib/db';
 import { User } from '@/types/database';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 
 export default function SupamailIDPage() {
   const [profile, setProfile] = useState<User | null>(null);
@@ -49,107 +65,161 @@ export default function SupamailIDPage() {
 
   if (loading) {
     return (
-      <div className="h-[60vh] flex flex-col items-center justify-center text-slate-400 gap-4">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+      <div className="flex h-[60vh] flex-col items-center justify-center gap-4 text-slate-400">
+        <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
         <p className="font-medium">Loading your profile...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="animate-in fade-in slide-in-from-bottom-4 space-y-8 duration-700">
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-1">Supamail ID</h1>
-          <p className="text-sm text-slate-500 font-medium">Manage your personal masked email identity.</p>
+          <h1 className="mb-1 text-3xl font-black tracking-tight text-slate-900">
+            Supamail ID
+          </h1>
+          <p className="text-sm font-medium text-slate-500">
+            Manage your personal masked email identity.
+          </p>
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-1">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 sticky top-24">
-            <div className="bg-indigo-600 w-10 h-10 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-100">
-              <UserIcon className="text-white w-5 h-5" />
-            </div>
-            <h3 className="text-lg font-black text-slate-900 mb-1">Configure Your ID</h3>
-            <p className="text-slate-500 text-xs font-medium mb-6">This is the email address you'll give to others.</p>
-
-            <form onSubmit={handleUpdateUsername} className="space-y-4">
-              <div>
-                <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Username</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="e.g. mario"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all pr-10"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''))}
-                    disabled={isUpdating}
-                  />
-                  {profile?.username && profile.username === username && (
-                    <Check className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 w-4 h-4" />
-                  )}
-                </div>
-                <p className="mt-1.5 text-[9px] text-slate-400 font-medium">
-                  Your address: <span className="text-indigo-600 font-bold">{username || 'username'}@{process.env.NEXT_PUBLIC_MAILGUN_DOMAIN || 'supamail.mariobalca.com'}</span>
-                </p>
+          <Card className="sticky top-24">
+            <CardHeader>
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 shadow-lg shadow-indigo-100">
+                <UserIcon className="h-5 w-5 text-white" />
               </div>
-              <button
-                type="submit"
-                disabled={isUpdating || !username || profile?.username === username}
-                className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold text-xs hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 active:scale-95 disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2"
-              >
-                {isUpdating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
-                {profile?.username ? 'Update ID' : 'Claim Your ID'}
-              </button>
-            </form>
-          </div>
+              <CardTitle>Configure Your ID</CardTitle>
+              <CardDescription>
+                This is the email address you&apos;ll give to others.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleUpdateUsername} className="space-y-4">
+                <div>
+                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                    Username
+                  </label>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      placeholder="e.g. mario"
+                      className="pr-10 font-bold"
+                      value={username}
+                      onChange={(e) =>
+                        setUsername(
+                          e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '')
+                        )
+                      }
+                      disabled={isUpdating}
+                    />
+                    {profile?.username && profile.username === username && (
+                      <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-500" />
+                    )}
+                  </div>
+                  <p className="mt-1.5 text-[9px] font-medium text-slate-400">
+                    Your address:{' '}
+                    <span className="font-bold text-indigo-600">
+                      {username || 'username'}@
+                      {process.env.NEXT_PUBLIC_MAILGUN_DOMAIN ||
+                        'supamail.mariobalca.com'}
+                    </span>
+                  </p>
+                </div>
+                <Button
+                  type="submit"
+                  disabled={
+                    isUpdating || !username || profile?.username === username
+                  }
+                  className="w-full"
+                >
+                  {isUpdating ? (
+                    <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                  ) : (
+                    <Check className="mr-2 h-3 w-3" />
+                  )}
+                  {profile?.username ? 'Update ID' : 'Claim Your ID'}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="lg:col-span-2 space-y-6">
-          <div className="grid md:grid-cols-2 gap-5">
-            <Link href="/dashboard/rules" className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:border-indigo-100 hover:shadow-xl transition-all group">
-              <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <Shield size={20} />
-              </div>
-              <h4 className="text-lg font-black text-slate-900 mb-1">Filtering Rules</h4>
-              <p className="text-slate-500 text-xs font-medium mb-3">Control exactly who can reach your primary inbox.</p>
-              <div className="flex items-center gap-1.5 text-indigo-600 text-xs font-bold">
-                Manage Rules <ArrowRight size={14} />
-              </div>
-            </Link>
+        <div className="space-y-6 lg:col-span-2">
+          <div className="grid gap-5 md:grid-cols-2">
+            <Card
+              className="group transition-all hover:border-indigo-100 hover:shadow-xl"
+              asChild
+            >
+              <Link href="/dashboard/rules">
+                <CardContent className="p-6">
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 transition-transform group-hover:scale-110">
+                    <Shield size={20} />
+                  </div>
+                  <h4 className="mb-1 text-lg font-black text-slate-900">
+                    Filtering Rules
+                  </h4>
+                  <p className="mb-3 text-xs font-medium text-slate-500">
+                    Control exactly who can reach your primary inbox.
+                  </p>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-600">
+                    Manage Rules <ArrowRight size={14} />
+                  </div>
+                </CardContent>
+              </Link>
+            </Card>
 
-            <Link href="/dashboard/logs" className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:border-indigo-100 hover:shadow-xl transition-all group">
-              <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <History size={20} />
-              </div>
-              <h4 className="text-lg font-black text-slate-900 mb-1">Activity History</h4>
-              <p className="text-slate-500 text-xs font-medium mb-3">See which emails were forwarded or blocked by the AI.</p>
-              <div className="flex items-center gap-1.5 text-indigo-600 text-xs font-bold">
-                View Activity <ArrowRight size={14} />
-              </div>
-            </Link>
+            <Card
+              className="group transition-all hover:border-indigo-100 hover:shadow-xl"
+              asChild
+            >
+              <Link href="/dashboard/logs">
+                <CardContent className="p-6">
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition-transform group-hover:scale-110">
+                    <History size={20} />
+                  </div>
+                  <h4 className="mb-1 text-lg font-black text-slate-900">
+                    Activity History
+                  </h4>
+                  <p className="mb-3 text-xs font-medium text-slate-500">
+                    See which emails were forwarded or blocked by the AI.
+                  </p>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-600">
+                    View Activity <ArrowRight size={14} />
+                  </div>
+                </CardContent>
+              </Link>
+            </Card>
           </div>
 
-          <div className="bg-slate-900 p-8 rounded-3xl text-white overflow-hidden relative group shadow-2xl">
-             <div className="relative z-10">
-                <h4 className="text-xl font-black mb-4 tracking-tight">How it works</h4>
-                <div className="space-y-3">
-                  {[
-                    "Give your Supamail ID to services you don't trust.",
-                    "Emails are received by us and checked against your rules.",
-                    "Allowed emails are summarized by AI and forwarded to you.",
-                    "Blocked emails are stored in your activity feed but never bother you."
-                  ].map((text, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full bg-indigo-600 flex items-center justify-center text-[9px] font-black shrink-0 mt-0.5">{i+1}</div>
-                      <p className="text-slate-400 text-xs font-medium leading-relaxed">{text}</p>
+          <Card className="group relative overflow-hidden border-none bg-slate-900 text-white shadow-2xl">
+            <CardContent className="relative z-10 p-8">
+              <h4 className="mb-4 text-xl font-black tracking-tight">
+                How it works
+              </h4>
+              <div className="space-y-3">
+                {[
+                  "Give your Supamail ID to services you don't trust.",
+                  'Emails are received by us and checked against your rules.',
+                  'Allowed emails are summarized by AI and forwarded to you.',
+                  'Blocked emails are stored in your activity feed but never bother you.',
+                ].map((text, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-[9px] font-black">
+                      {i + 1}
                     </div>
-                  ))}
-                </div>
-             </div>
-             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-[100px] rounded-full" />
-          </div>
+                    <p className="text-xs font-medium leading-relaxed text-slate-400">
+                      {text}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+            <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-indigo-500/10 blur-[100px]" />
+          </Card>
         </div>
       </div>
     </div>

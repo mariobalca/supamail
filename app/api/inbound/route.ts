@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserBySupamailAddress, getRulesForUser, logEmailActivity } from '@/lib/db.server';
+import {
+  getUserBySupamailAddress,
+  getRulesForUser,
+  logEmailActivity,
+} from '@/lib/db.server';
 import { verifySignature, forwardEmail } from '@/lib/mailgun';
 import { generateSmartSubject } from '@/lib/ai';
 import { Rule } from '@/types/database';
@@ -26,15 +30,18 @@ export async function POST(req: NextRequest) {
     const user = await getUserBySupamailAddress(recipient);
 
     if (!user) {
-      return NextResponse.json({ error: 'Recipient not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Recipient not found' },
+        { status: 404 }
+      );
     }
 
     // 3. Check Rules (Whitelist/Blacklist)
     const rules = await getRulesForUser(user.id);
 
     // Simple matching logic
-    const isBlocked = rules?.some((rule: Rule) =>
-      rule.action === 'block' && sender.includes(rule.pattern)
+    const isBlocked = rules?.some(
+      (rule: Rule) => rule.action === 'block' && sender.includes(rule.pattern)
     );
 
     if (isBlocked) {
@@ -42,13 +49,16 @@ export async function POST(req: NextRequest) {
         user_id: user.id,
         sender,
         subject,
-        status: 'blocked'
+        status: 'blocked',
       });
       return NextResponse.json({ message: 'Email blocked' });
     }
 
     // 4. AI Feature: Generate Smart Subject/Summary
-    const { summary, enhancedSubject } = await generateSmartSubject(subject, bodyPlain || bodyHtml);
+    const { summary, enhancedSubject } = await generateSmartSubject(
+      subject,
+      bodyPlain || bodyHtml
+    );
 
     // 5. Forward Email via Mailgun
     await forwardEmail(
@@ -65,7 +75,7 @@ export async function POST(req: NextRequest) {
       sender,
       subject,
       ai_summary: summary,
-      status: 'forwarded'
+      status: 'forwarded',
     });
 
     return NextResponse.json({ message: 'Email forwarded' });

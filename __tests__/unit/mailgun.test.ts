@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { verifySignature } from '@/lib/mailgun';
 import crypto from 'crypto';
 

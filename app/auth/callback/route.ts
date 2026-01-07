@@ -8,7 +8,9 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.exchangeCodeForSession(code);
+    const {
+      data: { user },
+    } = await supabase.auth.exchangeCodeForSession(code);
 
     if (user) {
       // Use supabaseAdmin to bypass RLS and ensure the profile is created
@@ -19,10 +21,12 @@ export async function GET(request: Request) {
         .single();
 
       if (fetchError || !existingUser) {
-        const { error: insertError } = await supabaseAdmin.from('users').insert({
-          id: user.id,
-          email: user.email!,
-        });
+        const { error: insertError } = await supabaseAdmin
+          .from('users')
+          .insert({
+            id: user.id,
+            email: user.email!,
+          });
 
         if (insertError) {
           console.error('Error creating user profile:', insertError);

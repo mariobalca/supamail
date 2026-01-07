@@ -12,7 +12,10 @@ const getOpenAI = () => {
   return openaiInstance;
 };
 
-export const generateSmartSubject = async (subject: string, body: string): Promise<SmartSubject> => {
+export const generateSmartSubject = async (
+  subject: string,
+  body: string
+): Promise<SmartSubject> => {
   try {
     const openai = getOpenAI();
     const response = await openai.chat.completions.create({
@@ -20,12 +23,13 @@ export const generateSmartSubject = async (subject: string, body: string): Promi
       messages: [
         {
           role: 'system',
-          content: 'You are an email assistant. Summarize the following email in 3-5 words to be used in a subject line prefix like [Summary].'
+          content:
+            'You are an email assistant. Summarize the following email in 3-5 words to be used in a subject line prefix like [Summary].',
         },
         {
           role: 'user',
-          content: `Subject: ${subject}\n\nBody: ${body}`
-        }
+          content: `Subject: ${subject}\n\nBody: ${body}`,
+        },
       ],
       max_tokens: 10,
     });
@@ -33,13 +37,13 @@ export const generateSmartSubject = async (subject: string, body: string): Promi
     const summary = response.choices[0]?.message?.content?.trim() || 'Summary';
     return {
       summary,
-      enhancedSubject: `[${summary}] ${subject}`
+      enhancedSubject: `[${summary}] ${subject}`,
     };
   } catch (error) {
     console.error('AI Summary error:', error);
     return {
       summary: 'Summary unavailable',
-      enhancedSubject: `[AI] ${subject}`
+      enhancedSubject: `[AI] ${subject}`,
     };
   }
 };

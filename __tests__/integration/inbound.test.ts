@@ -32,7 +32,7 @@ describe('Inbound API Route', () => {
           fd.append(key, value);
         }
         return fd;
-      }
+      },
     } as unknown as NextRequest;
   };
 
@@ -40,7 +40,7 @@ describe('Inbound API Route', () => {
     const mockUser = {
       id: 'u1',
       email: 'real@email.com',
-      username: 'mario'
+      username: 'mario',
     };
 
     vi.mocked(mailgun.verifySignature).mockReturnValue(true);
@@ -48,7 +48,7 @@ describe('Inbound API Route', () => {
     vi.mocked(db.getRulesForUser).mockResolvedValue([]);
     vi.mocked(ai.generateSmartSubject).mockResolvedValue({
       summary: 'Summary',
-      enhancedSubject: '[Summary] Hello'
+      enhancedSubject: '[Summary] Hello',
     });
 
     const req = createMockRequest({
@@ -58,7 +58,7 @@ describe('Inbound API Route', () => {
       'body-plain': 'Test body',
       timestamp: '123',
       token: 'abc',
-      signature: 'sig'
+      signature: 'sig',
     });
 
     const response = await POST(req);
@@ -67,9 +67,11 @@ describe('Inbound API Route', () => {
     expect(response.status).toBe(200);
     expect(json.message).toBe('Email forwarded');
     expect(mailgun.forwardEmail).toHaveBeenCalled();
-    expect(db.logEmailActivity).toHaveBeenCalledWith(expect.objectContaining({
-      status: 'forwarded'
-    }));
+    expect(db.logEmailActivity).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: 'forwarded',
+      })
+    );
   });
 
   it('should block email if rule matches', async () => {
@@ -86,7 +88,7 @@ describe('Inbound API Route', () => {
       subject: 'Spam',
       timestamp: '123',
       token: 'abc',
-      signature: 'sig'
+      signature: 'sig',
     });
 
     const response = await POST(req);
@@ -94,9 +96,11 @@ describe('Inbound API Route', () => {
 
     expect(json.message).toBe('Email blocked');
     expect(mailgun.forwardEmail).not.toHaveBeenCalled();
-    expect(db.logEmailActivity).toHaveBeenCalledWith(expect.objectContaining({
-      status: 'blocked'
-    }));
+    expect(db.logEmailActivity).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: 'blocked',
+      })
+    );
   });
 
   it('should return 401 for invalid signature', async () => {
@@ -105,7 +109,7 @@ describe('Inbound API Route', () => {
     const req = createMockRequest({
       timestamp: '123',
       token: 'abc',
-      signature: 'wrong'
+      signature: 'wrong',
     });
 
     const response = await POST(req);

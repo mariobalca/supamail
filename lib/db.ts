@@ -3,7 +3,9 @@ import { Rule, Log, User } from '@/types/database';
 
 export const getProfile = async (): Promise<User | null> => {
   const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return null;
 
   const { data, error } = await supabase
@@ -18,7 +20,9 @@ export const getProfile = async (): Promise<User | null> => {
 
 export const updateUsername = async (username: string) => {
   const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
   const { error } = await supabase
@@ -40,9 +44,14 @@ export const getAllRules = async (): Promise<Rule[]> => {
   return data || [];
 };
 
-export const createRule = async (pattern: string, action: 'allow' | 'block') => {
+export const createRule = async (
+  pattern: string,
+  action: 'allow' | 'block'
+) => {
   const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
   const { data, error } = await supabase
@@ -57,10 +66,7 @@ export const createRule = async (pattern: string, action: 'allow' | 'block') => 
 
 export const deleteRule = async (id: string) => {
   const supabase = createClient();
-  const { error } = await supabase
-    .from('rules')
-    .delete()
-    .eq('id', id);
+  const { error } = await supabase.from('rules').delete().eq('id', id);
 
   if (error) throw error;
 };

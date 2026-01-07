@@ -20,7 +20,10 @@ async function simulateInbound() {
   formData.append('from', 'sender@example.com');
   formData.append('recipient', 'mariobalca@supamail.mariobalca.com');
   formData.append('subject', 'Test Email');
-  formData.append('body-plain', 'This is a test email body for AI summarization.');
+  formData.append(
+    'body-plain',
+    'This is a test email body for AI summarization.'
+  );
   formData.append('timestamp', timestamp);
   formData.append('token', token);
   formData.append('signature', signature);
