@@ -99,7 +99,7 @@ export default function LoginPage() {
                   input: 'shadow-sm',
                 },
               }}
-              providers={['github', 'google']}
+              providers={['google']}
               redirectTo={`${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`}
             />
           </div>
