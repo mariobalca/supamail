@@ -3,6 +3,10 @@ import {
   getUserBySupamailAddress,
   getRulesForUser,
   logEmailActivity,
+  getLog,
+  updateLogStatus,
+  getAllCategories,
+  getOrCreateCategory,
 } from '@/lib/db.server';
 
 vi.mock('@/lib/supabase/admin', () => {
@@ -11,7 +15,10 @@ vi.mock('@/lib/supabase/admin', () => {
     select: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
     single: vi.fn(),
-    insert: vi.fn(),
+    maybeSingle: vi.fn(),
+    insert: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    order: vi.fn().mockReturnThis(),
   };
   return {
     supabaseAdmin: mockSupabase,
@@ -95,6 +102,96 @@ describe('DB Service', () => {
       await logEmailActivity(payload);
       expect(mockSupabase.from).toHaveBeenCalledWith('logs');
       expect(mockSupabase.insert).toHaveBeenCalledWith(payload);
+    });
+  });
+
+  describe('getLog', () => {
+    it('should return log if found', async () => {
+      const mockLog = { id: 'l1', user_id: 'u1', status: 'blocked' };
+      mockSupabase.single.mockResolvedValueOnce({
+        data: mockLog,
+        error: null,
+      } as any);
+
+      const result = await getLog('l1');
+      expect(result).toEqual(mockLog);
+      expect(mockSupabase.from).toHaveBeenCalledWith('logs');
+      expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'l1');
+    });
+
+    it('should return null if not found', async () => {
+      mockSupabase.single.mockResolvedValueOnce({
+        data: null,
+        error: { message: 'Not found' },
+      } as any);
+
+      const result = await getLog('unknown');
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('updateLogStatus', () => {
+    it('should update log status', async () => {
+      mockSupabase.update.mockReturnThis();
+      mockSupabase.eq.mockResolvedValueOnce({ error: null } as any);
+
+      await updateLogStatus('l1', 'forwarded');
+      expect(mockSupabase.from).toHaveBeenCalledWith('logs');
+      expect(mockSupabase.update).toHaveBeenCalledWith({ status: 'forwarded' });
+      expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'l1');
+    });
+
+    it('should throw error if update fails', async () => {
+      mockSupabase.update.mockReturnThis();
+      mockSupabase.eq.mockResolvedValueOnce({
+        error: { message: 'Update failed' },
+      } as any);
+
+      await expect(updateLogStatus('l1', 'forwarded')).rejects.toThrow(
+        'Update failed'
+      );
+    });
+  });
+
+  describe('categories', () => {
+    it('should get all categories', async () => {
+      const mockCats = [{ name: 'Personal' }, { name: 'Work' }];
+      mockSupabase.order.mockResolvedValueOnce({
+        data: mockCats,
+        error: null,
+      } as any);
+
+      const result = await getAllCategories();
+      expect(result).toEqual(['Personal', 'Work']);
+      expect(mockSupabase.from).toHaveBeenCalledWith('categories');
+    });
+
+    it('should get or create category (existing)', async () => {
+      mockSupabase.maybeSingle.mockResolvedValueOnce({
+        data: { name: 'Personal' },
+        error: null,
+      } as any);
+
+      const result = await getOrCreateCategory('Personal');
+      expect(result).toBe('Personal');
+      expect(mockSupabase.maybeSingle).toHaveBeenCalled();
+    });
+
+    it('should get or create category (new)', async () => {
+      mockSupabase.maybeSingle.mockResolvedValueOnce({
+        data: null,
+        error: null,
+      } as any);
+      mockSupabase.insert.mockReturnThis();
+      mockSupabase.select.mockReturnThis();
+      mockSupabase.single.mockResolvedValueOnce({
+        data: { name: 'NewCat' },
+        error: null,
+      } as any);
+
+      const result = await getOrCreateCategory('NewCat');
+      expect(result).toBe('NewCat');
+      expect(mockSupabase.insert).toHaveBeenCalledWith({ name: 'NewCat' });
     });
   });
 });

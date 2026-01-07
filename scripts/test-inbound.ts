@@ -8,7 +8,42 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 const SIGNING_KEY = process.env.MAILGUN_SIGNING_KEY || 'test-key';
 const API_URL = 'http://localhost:3000/api/inbound';
 
+const SCENARIOS = {
+  personal: {
+    from: 'friend@gmail.com',
+    subject: 'Catching up',
+    body: 'Hey Mario, let us grab coffee soon!',
+  },
+  spam: {
+    from: 'lottery@win-big.net',
+    subject: 'YOU WON $1,000,000!!!',
+    body: 'Click here to claim your prize now. Unsubscribe from this mailing list.',
+  },
+  promotion: {
+    from: 'news@shopping-mall.com',
+    subject: 'Flash Sale: 50% Off Everything',
+    body: 'Do not miss out on our biggest sale of the year. Shop now!',
+  },
+  transactional: {
+    from: 'receipts@amazon.com',
+    subject: 'Your order #12345 has shipped',
+    body: 'Your package is on its way. Track it here.',
+  },
+};
+
 async function simulateInbound() {
+  const args = process.argv.slice(2);
+  const scenarioKey = args[0] as keyof typeof SCENARIOS;
+  const customRecipient = args[1];
+
+  let config = SCENARIOS.personal;
+  if (scenarioKey && SCENARIOS[scenarioKey]) {
+    config = SCENARIOS[scenarioKey];
+    console.log(`Using scenario: ${scenarioKey}`);
+  } else if (scenarioKey) {
+    console.log(`Scenario "${scenarioKey}" not found. Using personal.`);
+  }
+
   const timestamp = Math.floor(Date.now() / 1000).toString();
   const token = crypto.randomBytes(16).toString('hex');
   const signature = crypto
@@ -17,18 +52,21 @@ async function simulateInbound() {
     .digest('hex');
 
   const formData = new URLSearchParams();
-  formData.append('from', 'no-reply@supamail.mariobalca.com');
-  formData.append('recipient', 'mariobalca@supamail.mariobalca.com');
-  formData.append('subject', 'Test Email');
+  formData.append('from', config.from);
   formData.append(
-    'body-plain',
-    'This is a test email body for AI summarization.'
+    'recipient',
+    customRecipient || 'mario@supamail.mariobalca.com'
   );
+  formData.append('subject', config.subject);
+  formData.append('body-plain', config.body);
   formData.append('timestamp', timestamp);
   formData.append('token', token);
   formData.append('signature', signature);
 
   console.log('Sending mock email to:', API_URL);
+  console.log('From:', config.from);
+  console.log('To:', customRecipient || 'mario@supamail.mariobalca.com');
+  console.log('Subject:', config.subject);
 
   try {
     const response = await fetch(API_URL, {
@@ -37,7 +75,7 @@ async function simulateInbound() {
     });
 
     const result = await response.json();
-    console.log('Status:', response.status);
+    console.log('\nStatus:', response.status);
     console.log('Response:', JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Error sending request:', error);

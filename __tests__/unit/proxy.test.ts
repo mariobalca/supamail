@@ -71,4 +71,21 @@ describe('Proxy Middleware', () => {
     // NextResponse.next() status is usually 200 in mock or carries request headers
     expect(res?.status).toBe(200);
   });
+
+  it('handles cookies setAll correctly', async () => {
+    let setAllFn: any;
+    (createServerClient as any).mockImplementation((_url: string, _key: string, options: any) => {
+      setAllFn = options.cookies.setAll;
+      return mockSupabase;
+    });
+
+    const req = createRequest('/home');
+    await proxy(req);
+
+    expect(setAllFn).toBeDefined();
+
+    const cookiesToSet = [{ name: 'test', value: 'val', options: { path: '/' } }];
+    setAllFn(cookiesToSet);
+    // This should not throw and should call request.cookies.set and update response
+  });
 });

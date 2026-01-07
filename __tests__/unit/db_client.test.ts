@@ -6,6 +6,7 @@ import {
   createRule,
   deleteRule,
   getLogs,
+  getCategories,
 } from '@/lib/db';
 
 vi.mock('@/lib/supabase/client', () => {
@@ -123,6 +124,18 @@ describe('Client DB Service', () => {
       const logs = await getLogs();
       expect(logs).toHaveLength(1);
       expect(mockSupabase.from).toHaveBeenCalledWith('logs');
+    });
+  });
+
+  describe('getCategories', () => {
+    it('should return categories', async () => {
+      mockSupabase.order.mockResolvedValue({
+        data: [{ name: 'Personal' }, { name: 'Social' }],
+        error: null,
+      });
+      const categories = await getCategories();
+      expect(categories).toEqual(['Personal', 'Social']);
+      expect(mockSupabase.from).toHaveBeenCalledWith('categories');
     });
   });
 });
