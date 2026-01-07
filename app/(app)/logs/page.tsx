@@ -7,7 +7,6 @@ import {
   Loader2,
   CheckCircle2,
   XCircle,
-  ArrowRight,
   Shield,
   RotateCw,
   Eye,
@@ -313,43 +312,6 @@ export default function LogsPage() {
           )}
         </div>
       </Card>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="group relative border-none bg-slate-900 text-white">
-          <CardContent className="relative z-10 flex items-center gap-5 p-8">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-indigo-400 transition-transform group-hover:scale-110">
-              <History size={20} />
-            </div>
-            <div>
-              <h4 className="mb-1 text-lg font-black tracking-tight">
-                Real-time Activity
-              </h4>
-              <p className="text-xs font-medium leading-relaxed text-slate-400">
-                Dashboard is live. New emails appear instantly.
-              </p>
-            </div>
-          </CardContent>
-          <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-indigo-500/10 blur-[100px]" />
-        </Card>
-
-        <Card className="group relative border-none bg-indigo-600 text-white">
-          <CardContent className="relative z-10 flex items-center gap-5 p-8 text-white">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-white transition-transform group-hover:rotate-12">
-              <ArrowRight size={20} />
-            </div>
-            <div>
-              <h4 className="mb-1 text-lg font-black tracking-tight">
-                Selective Forwarding
-              </h4>
-              <p className="text-xs font-medium leading-relaxed text-white/70">
-                Only allowed senders reach your inbox. Everything else is
-                blocked.
-              </p>
-            </div>
-          </CardContent>
-          <div className="absolute bottom-0 right-0 h-48 w-48 rounded-full bg-white/10 blur-[80px]" />
-        </Card>
-      </div>
 
       {selectedLog && (
         <EmailModal log={selectedLog} onClose={() => setSelectedLog(null)} />
