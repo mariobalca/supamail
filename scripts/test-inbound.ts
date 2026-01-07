@@ -10,22 +10,22 @@ const API_URL = 'http://localhost:3000/api/inbound';
 
 const SCENARIOS = {
   personal: {
-    from: 'friend@supabase.mariobalca.com',
+    from: `friend@${process.env.MAILGUN_DOMAIN}`,
     subject: 'Catching up',
-    body: 'Hey Mario, let us grab coffee soon!',
+    body: 'Hey John, let us grab coffee soon!',
   },
   spam: {
-    from: 'lottery@supabase.mariobalca.com',
+    from: `lottery@${process.env.MAILGUN_DOMAIN}`,
     subject: 'YOU WON $1,000,000!!!',
     body: 'Click here to claim your prize now. Unsubscribe from this mailing list.',
   },
   promotion: {
-    from: 'news@supabase.mariobalca.com',
+    from: `news@${process.env.MAILGUN_DOMAIN}`,
     subject: 'Flash Sale: 50% Off Everything',
     body: 'Do not miss out on our biggest sale of the year. Shop now!',
   },
   transactional: {
-    from: 'receipts@supabase.mariobalca.com',
+    from: `receipts@${process.env.MAILGUN_DOMAIN}`,
     subject: 'Your order #12345 has shipped',
     body: 'Your package is on its way. Track it here.',
   },
@@ -55,7 +55,7 @@ async function simulateInbound() {
   formData.append('from', config.from);
   formData.append(
     'recipient',
-    customRecipient || 'mariobalca@supamail.mariobalca.com'
+    customRecipient || 'username@supamail-domain.com'
   );
   formData.append('subject', config.subject);
   formData.append('body-plain', config.body);
@@ -65,7 +65,7 @@ async function simulateInbound() {
 
   console.log('Sending mock email to:', API_URL);
   console.log('From:', config.from);
-  console.log('To:', customRecipient || 'mariobalca@supamail.mariobalca.com');
+  console.log('To:', customRecipient || 'username@supamail-domain.com');
   console.log('Subject:', config.subject);
 
   try {

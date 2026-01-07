@@ -135,7 +135,7 @@ export default function SettingsPage() {
                 <div className="relative">
                   <Input
                     type="text"
-                    placeholder="e.g. mario"
+                    placeholder="e.g. johndoe"
                     className="pr-10 font-bold"
                     value={username}
                     onChange={(e) =>
@@ -154,7 +154,7 @@ export default function SettingsPage() {
                   <span className="font-bold text-indigo-600">
                     {username || 'username'}@
                     {process.env.NEXT_PUBLIC_MAILGUN_DOMAIN ||
-                      'supamail.mariobalca.com'}
+                      'supamail-domain.com'}
                   </span>
                 </p>
               </div>

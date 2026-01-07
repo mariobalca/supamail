@@ -65,7 +65,7 @@ export default function DashboardPage() {
           {
             name: 'Supamail ID',
             value: profileData?.username
-              ? `${profileData.username}@${process.env.NEXT_PUBLIC_MAILGUN_DOMAIN || 'supamail.mariobalca.com'}`
+              ? `${profileData.username}@${process.env.NEXT_PUBLIC_MAILGUN_DOMAIN || 'supamail-domain.com'}`
               : 'Not set',
             icon: Mail,
             color: 'text-indigo-600',

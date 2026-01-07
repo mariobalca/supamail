@@ -321,7 +321,7 @@ export default function RulesPage() {
                           <span className="font-bold text-indigo-600">
                             {profile?.username}@
                             {process.env.NEXT_PUBLIC_MAILGUN_DOMAIN ||
-                              'supamail.mariobalca.com'}
+                              'supamail-domain.com'}
                           </span>
                         </p>
                       </div>

@@ -40,7 +40,7 @@ describe('Inbound API Route', () => {
     const mockUser = {
       id: 'u1',
       email: 'real@email.com',
-      username: 'mario',
+      username: 'username',
     };
 
     vi.mocked(mailgun.verifySignature).mockReturnValue(true);
@@ -54,7 +54,7 @@ describe('Inbound API Route', () => {
 
     const req = createMockRequest({
       from: 'sender@example.com',
-      recipient: 'mario@supamail.mariobalca.com',
+      recipient: 'username@supamail-domain.com',
       subject: 'Hello',
       'body-plain': 'Test body',
       timestamp: '123',
@@ -76,7 +76,7 @@ describe('Inbound API Route', () => {
   });
 
   it('should block email if rule matches (domain)', async () => {
-    const mockUser = { id: 'u1', username: 'mario' };
+    const mockUser = { id: 'u1', username: 'username' };
     const mockRules = [
       { action: 'block', pattern: 'spam.com', type: 'domain' },
     ];
@@ -92,7 +92,7 @@ describe('Inbound API Route', () => {
 
     const req = createMockRequest({
       from: 'bad@spam.com',
-      recipient: 'mario@supamail.mariobalca.com',
+      recipient: 'username@supamail-domain.com',
       subject: 'Spam',
       timestamp: '123',
       token: 'abc',
@@ -107,7 +107,7 @@ describe('Inbound API Route', () => {
   });
 
   it('should block email if rule matches (category)', async () => {
-    const mockUser = { id: 'u1', username: 'mario' };
+    const mockUser = { id: 'u1', username: 'username' };
     const mockRules = [
       { action: 'block', pattern: 'Promotions', type: 'category' },
     ];
@@ -123,7 +123,7 @@ describe('Inbound API Route', () => {
 
     const req = createMockRequest({
       from: 'newsletter@store.com',
-      recipient: 'mario@supamail.mariobalca.com',
+      recipient: 'username@supamail-domain.com',
       subject: 'Sale',
       timestamp: '123',
       token: 'abc',
@@ -138,7 +138,7 @@ describe('Inbound API Route', () => {
   });
 
   it('should allow email if whitelisted email overrides blocked domain', async () => {
-    const mockUser = { id: 'u1', username: 'mario', email: 'mario@real.com' };
+    const mockUser = { id: 'u1', username: 'username', email: 'username@real.com' };
     const mockRules = [
       { action: 'block', pattern: 'spam.com', type: 'domain' },
       { action: 'allow', pattern: 'good@spam.com', type: 'email' },
@@ -155,7 +155,7 @@ describe('Inbound API Route', () => {
 
     const req = createMockRequest({
       from: 'good@spam.com',
-      recipient: 'mario@supamail.mariobalca.com',
+      recipient: 'username@supamail-domain.com',
       subject: 'Hi',
       timestamp: '123',
       token: 'abc',
@@ -170,7 +170,7 @@ describe('Inbound API Route', () => {
   });
 
   it('should allow email if whitelisted domain overrides blocked category', async () => {
-    const mockUser = { id: 'u1', username: 'mario', email: 'mario@real.com' };
+    const mockUser = { id: 'u1', username: 'username', email: 'username@real.com' };
     const mockRules = [
       { action: 'block', pattern: 'Promotions', type: 'category' },
       { action: 'allow', pattern: 'newsletter.com', type: 'domain' },
@@ -187,7 +187,7 @@ describe('Inbound API Route', () => {
 
     const req = createMockRequest({
       from: 'info@newsletter.com',
-      recipient: 'mario@supamail.mariobalca.com',
+      recipient: 'username@supamail-domain.com',
       subject: 'Sale',
       timestamp: '123',
       token: 'abc',
@@ -202,7 +202,7 @@ describe('Inbound API Route', () => {
   });
 
   it('should block email if whitelisted category overridden by blocked domain', async () => {
-    const mockUser = { id: 'u1', username: 'mario', email: 'mario@real.com' };
+    const mockUser = { id: 'u1', username: 'username', email: 'username@real.com' };
     const mockRules = [
       { action: 'allow', pattern: 'Promotions', type: 'category' },
       { action: 'block', pattern: 'evil.com', type: 'domain' },
@@ -219,7 +219,7 @@ describe('Inbound API Route', () => {
 
     const req = createMockRequest({
       from: 'bad@evil.com',
-      recipient: 'mario@supamail.mariobalca.com',
+      recipient: 'username@supamail-domain.com',
       subject: 'Sale',
       timestamp: '123',
       token: 'abc',

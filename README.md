@@ -4,7 +4,7 @@ Supamail is a professional-grade SaaS designed to protect your primary inbox fro
 
 ## 🚀 Key Features
 
-- **Supamail ID (Identity Protection)**: Claim a unique `username@supamail.mariobalca.com` and use it everywhere instead of your real email.
+- **Supamail ID (Identity Protection)**: Claim a unique `username@supamail-domain.com` and use it everywhere instead of your real email.
 - **AI Smart-Digest**: Automatically categorizes incoming emails and generates concise 3-5 word summaries, prepended to the subject line for instant context.
 - **Advanced Filtering Engine**: Set granular rules to allow or block emails based on:
   - **Specific Email Addresses**

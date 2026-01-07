@@ -157,7 +157,7 @@ export default function OnboardingPage() {
                   <div className="relative">
                     <Input
                       type="text"
-                      placeholder="e.g. mario"
+                      placeholder="e.g. johndoe"
                       className="pr-24 font-bold"
                       value={username}
                       onChange={(e) =>
@@ -174,7 +174,7 @@ export default function OnboardingPage() {
                   <p className="mt-3 text-xs font-medium text-slate-500">
                     Your address will be:{' '}
                     <span className="font-bold text-indigo-600">
-                      {username || 'username'}@{process.env.NEXT_PUBLIC_MAILGUN_DOMAIN || 'supamail.mariobalca.com'}
+                      {username || 'username'}@{process.env.NEXT_PUBLIC_MAILGUN_DOMAIN || 'supamail-domain.com'}
                     </span>
                   </p>
                 </div>

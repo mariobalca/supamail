@@ -41,7 +41,7 @@ describe('DB Service', () => {
       const mockUser = {
         id: 'u1',
         email: 'real@email.com',
-        username: 'mario',
+        username: 'username',
       };
 
       mockSupabase.single.mockResolvedValueOnce({
@@ -50,16 +50,16 @@ describe('DB Service', () => {
       } as any);
 
       const result = await getUserBySupamailAddress(
-        'mario@supamail.mariobalca.com'
+        'username@supamail-domain.com'
       );
       expect(result).toBeDefined();
-      expect(result?.username).toBe('mario');
+      expect(result?.username).toBe('username');
       expect(mockSupabase.from).toHaveBeenCalledWith('users');
-      expect(mockSupabase.eq).toHaveBeenCalledWith('username', 'mario');
+      expect(mockSupabase.eq).toHaveBeenCalledWith('username', 'username');
     });
 
     it('should return null if domain does not match', async () => {
-      const result = await getUserBySupamailAddress('mario@wrongdomain.com');
+      const result = await getUserBySupamailAddress('username@wrongdomain.com');
       expect(result).toBeNull();
     });
 
@@ -69,7 +69,7 @@ describe('DB Service', () => {
         error: { message: 'Not found' },
       } as any);
       const result = await getUserBySupamailAddress(
-        'unknown@supamail.mariobalca.com'
+        'unknown@supamail-domain.com'
       );
       expect(result).toBeNull();
     });

@@ -52,7 +52,7 @@ describe('Proxy Middleware', () => {
     mockSupabase.auth.getUser.mockResolvedValue({
       data: { user: { id: 'u1' } }
     });
-    mockSupabase.single.mockResolvedValue({ data: { username: 'mario' } });
+    mockSupabase.single.mockResolvedValue({ data: { username: 'username' } });
 
     const req = createRequest('/onboarding');
     const res = await proxy(req);
@@ -64,7 +64,7 @@ describe('Proxy Middleware', () => {
     mockSupabase.auth.getUser.mockResolvedValue({
       data: { user: { id: 'u1' } }
     });
-    mockSupabase.single.mockResolvedValue({ data: { username: 'mario' } });
+    mockSupabase.single.mockResolvedValue({ data: { username: 'username' } });
 
     const req = createRequest('/home');
     const res = await proxy(req);

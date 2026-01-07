@@ -46,12 +46,12 @@ describe('Client DB Service', () => {
         error: null,
       });
       mockSupabase.single.mockResolvedValue({
-        data: { id: 'u1', username: 'mario' },
+        data: { id: 'u1', username: 'username' },
         error: null,
       });
 
       const profile = await getProfile();
-      expect(profile?.username).toBe('mario');
+      expect(profile?.username).toBe('username');
       expect(mockSupabase.from).toHaveBeenCalledWith('users');
       expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'u1');
     });
