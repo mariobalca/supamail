@@ -11,6 +11,7 @@ const getMailgunClient = () => {
     mgInstance = mailgun.client({
       username: 'api',
       key: process.env.MAILGUN_API_KEY || 'dummy-key',
+      url: process.env.MAILGUN_URL || 'https://api.eu.mailgun.net', // Support EU region
     });
   }
   return mgInstance;

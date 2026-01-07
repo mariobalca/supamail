@@ -37,15 +37,15 @@ describe('Inbound API Route', () => {
   };
 
   it('should forward email successfully', async () => {
-    const mockAlias = {
-      id: '1',
-      address: 'alias@tool.com',
-      users: { email: 'real@email.com' }
+    const mockUser = {
+      id: 'u1',
+      email: 'real@email.com',
+      username: 'mario'
     };
 
     vi.mocked(mailgun.verifySignature).mockReturnValue(true);
-    vi.mocked(db.getAliasWithUser).mockResolvedValue(mockAlias as any);
-    vi.mocked(db.getRulesForAlias).mockResolvedValue([]);
+    vi.mocked(db.getUserBySupamailAddress).mockResolvedValue(mockUser as any);
+    vi.mocked(db.getRulesForUser).mockResolvedValue([]);
     vi.mocked(ai.generateSmartSubject).mockResolvedValue({
       summary: 'Summary',
       enhancedSubject: '[Summary] Hello'
@@ -53,7 +53,7 @@ describe('Inbound API Route', () => {
 
     const req = createMockRequest({
       from: 'sender@example.com',
-      recipient: 'alias@tool.com',
+      recipient: 'mario@supamail.mariobalca.com',
       subject: 'Hello',
       'body-plain': 'Test body',
       timestamp: '123',
@@ -73,16 +73,16 @@ describe('Inbound API Route', () => {
   });
 
   it('should block email if rule matches', async () => {
-    const mockAlias = { id: '1', address: 'alias@tool.com' };
+    const mockUser = { id: 'u1', username: 'mario' };
     const mockRules = [{ action: 'block', pattern: 'spam.com' }];
 
     vi.mocked(mailgun.verifySignature).mockReturnValue(true);
-    vi.mocked(db.getAliasWithUser).mockResolvedValue(mockAlias as any);
-    vi.mocked(db.getRulesForAlias).mockResolvedValue(mockRules as any);
+    vi.mocked(db.getUserBySupamailAddress).mockResolvedValue(mockUser as any);
+    vi.mocked(db.getRulesForUser).mockResolvedValue(mockRules as any);
 
     const req = createMockRequest({
       from: 'bad@spam.com',
-      recipient: 'alias@tool.com',
+      recipient: 'mario@supamail.mariobalca.com',
       subject: 'Spam',
       timestamp: '123',
       token: 'abc',

@@ -1,48 +1,30 @@
 import { createClient } from './supabase/client';
-import { Alias, Rule, Log } from '@/types/database';
+import { Rule, Log, User } from '@/types/database';
 
-export const getAliases = async (): Promise<Alias[]> => {
+export const getProfile = async (): Promise<User | null> => {
   const supabase = createClient();
-  const { data, error } = await supabase
-    .from('aliases')
-    .select('*')
-    .order('created_at', { ascending: false });
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
 
-  if (error) throw error;
-  return data || [];
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  if (error) return null;
+  return data;
 };
 
-export const createAlias = async (address: string) => {
+export const updateUsername = async (username: string) => {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  const { data, error } = await supabase
-    .from('aliases')
-    .insert({ address, user_id: user.id })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
-};
-
-export const toggleAliasStatus = async (id: string, isActive: boolean) => {
-  const supabase = createClient();
   const { error } = await supabase
-    .from('aliases')
-    .update({ is_active: isActive })
-    .eq('id', id);
-
-  if (error) throw error;
-};
-
-export const deleteAlias = async (id: string) => {
-  const supabase = createClient();
-  const { error } = await supabase
-    .from('aliases')
-    .delete()
-    .eq('id', id);
+    .from('users')
+    .update({ username, updated_at: new Date().toISOString() })
+    .eq('id', user.id);
 
   if (error) throw error;
 };
@@ -51,18 +33,21 @@ export const getAllRules = async (): Promise<Rule[]> => {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('rules')
-    .select('*, aliases(address)')
+    .select('*')
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data as any;
+  return data || [];
 };
 
-export const createRule = async (aliasId: string, pattern: string, action: 'allow' | 'block') => {
+export const createRule = async (pattern: string, action: 'allow' | 'block') => {
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
   const { data, error } = await supabase
     .from('rules')
-    .insert({ alias_id: aliasId, pattern, action })
+    .insert({ user_id: user.id, pattern, action })
     .select()
     .single();
 
@@ -80,13 +65,13 @@ export const deleteRule = async (id: string) => {
   if (error) throw error;
 };
 
-export const getLogs = async (): Promise<(Log & { aliases: { address: string } })[]> => {
+export const getLogs = async (): Promise<Log[]> => {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('logs')
-    .select('*, aliases(address)')
+    .select('*')
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data as any;
+  return data || [];
 };

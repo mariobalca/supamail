@@ -2,20 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { Shield, Plus, Trash2, Loader2, Search, Filter, Mail, CheckCircle2, XCircle } from 'lucide-react';
-import { getAllRules, createRule, deleteRule, getAliases } from '@/lib/db';
-import { Rule, Alias } from '@/types/database';
-
-type RuleWithAlias = Rule & { aliases: { address: string } };
+import { getAllRules, createRule, deleteRule, getProfile } from '@/lib/db';
+import { Rule, User } from '@/types/database';
 
 export default function RulesPage() {
-  const [rules, setRules] = useState<RuleWithAlias[]>([]);
-  const [aliases, setAliases] = useState<Alias[]>([]);
+  const [rules, setRules] = useState<Rule[]>([]);
+  const [profile, setProfile] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Form state
-  const [selectedAliasId, setSelectedAliasId] = useState('');
   const [pattern, setPattern] = useState('');
   const [action, setAction] = useState<'allow' | 'block'>('block');
 
@@ -25,15 +22,12 @@ export default function RulesPage() {
 
   const fetchData = async () => {
     try {
-      const [rulesData, aliasesData] = await Promise.all([
+      const [rulesData, profileData] = await Promise.all([
         getAllRules(),
-        getAliases()
+        getProfile()
       ]);
-      setRules(rulesData as RuleWithAlias[]);
-      setAliases(aliasesData);
-      if (aliasesData.length > 0) {
-        setSelectedAliasId(aliasesData[0].id);
-      }
+      setRules(rulesData);
+      setProfile(profileData);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -43,11 +37,11 @@ export default function RulesPage() {
 
   const handleCreateRule = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedAliasId || !pattern) return;
+    if (!pattern) return;
 
     setIsCreating(true);
     try {
-      await createRule(selectedAliasId, pattern, action);
+      await createRule(pattern, action);
       setPattern('');
       fetchData();
     } catch (error) {
@@ -68,9 +62,8 @@ export default function RulesPage() {
     }
   };
 
-  const filteredRules = rules.filter(r => 
-    r.pattern.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.aliases?.address.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredRules = rules.filter(r =>
+    r.pattern.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -78,7 +71,7 @@ export default function RulesPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-2">Rules</h1>
-          <p className="text-slate-500 font-medium">Define who can reach your inbox.</p>
+          <p className="text-slate-500 font-medium">Define who can reach your primary inbox.</p>
         </div>
       </div>
 
@@ -90,27 +83,9 @@ export default function RulesPage() {
               <Shield className="text-white w-6 h-6" />
             </div>
             <h3 className="text-xl font-black text-slate-900 mb-2">New Rule</h3>
-            <p className="text-slate-500 text-sm font-medium mb-6">Set up a new filtering pattern for an alias.</p>
-            
-            <form onSubmit={handleCreateRule} className="space-y-4">
-              <div>
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Target Alias</label>
-                <select
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all appearance-none"
-                  value={selectedAliasId}
-                  onChange={(e) => setSelectedAliasId(e.target.value)}
-                  disabled={isCreating || aliases.length === 0}
-                >
-                  {aliases.length === 0 ? (
-                    <option>Create an alias first</option>
-                  ) : (
-                    aliases.map(a => (
-                      <option key={a.id} value={a.id}>{a.address}</option>
-                    ))
-                  )}
-                </select>
-              </div>
+            <p className="text-slate-500 text-sm font-medium mb-6">Set up a new filtering pattern for your Supamail ID.</p>
 
+            <form onSubmit={handleCreateRule} className="space-y-4">
               <div>
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Pattern (Email or Domain)</label>
                 <input
@@ -155,11 +130,11 @@ export default function RulesPage() {
 
               <button
                 type="submit"
-                disabled={isCreating || !pattern || aliases.length === 0}
+                disabled={isCreating || !pattern || !profile?.username}
                 className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2"
               >
                 {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                Add Rule
+                {!profile?.username ? 'Claim your ID first' : 'Add Rule'}
               </button>
             </form>
           </div>
@@ -171,9 +146,9 @@ export default function RulesPage() {
             <div className="p-6 border-b border-slate-50 flex items-center justify-between">
               <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl w-64 group focus-within:border-indigo-300 transition-all">
                 <Search className="w-4 h-4 text-slate-400 group-focus-within:text-indigo-500" />
-                <input 
-                  type="text" 
-                  placeholder="Filter rules..." 
+                <input
+                  type="text"
+                  placeholder="Filter rules..."
                   className="bg-transparent border-none outline-none text-sm w-full font-medium placeholder:text-slate-400"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -195,7 +170,7 @@ export default function RulesPage() {
                   </div>
                   <div>
                     <p className="font-bold text-slate-900">No rules found</p>
-                    <p className="text-sm font-medium">Add your first rule to control your incoming mail.</p>
+                    <p className="text-sm font-medium">Add your first rule to control your Supamail ID.</p>
                   </div>
                 </div>
               ) : (
@@ -218,7 +193,7 @@ export default function RulesPage() {
                         </div>
                         <p className="text-slate-400 text-xs font-medium flex items-center gap-1.5">
                           <Mail size={12} className="opacity-50" />
-                          Targeting: <span className="text-indigo-600 font-bold">{rule.aliases?.address}</span>
+                          Protecting: <span className="text-indigo-600 font-bold">{profile?.username}@{process.env.NEXT_PUBLIC_MAILGUN_DOMAIN || 'supamail.mariobalca.com'}</span>
                         </p>
                       </div>
                     </div>
@@ -246,8 +221,8 @@ export default function RulesPage() {
                 <div>
                    <h4 className="text-xl font-black mb-2 tracking-tight">How rules work</h4>
                    <p className="text-slate-400 text-sm font-medium leading-relaxed">
-                      Rules are applied per alias. If an incoming email matches a pattern, we take the specified action. 
-                      You can use partial matches like <code className="text-indigo-400 bg-white/5 px-1.5 py-0.5 rounded text-xs font-bold">@gmail.com</code> to block all Gmail senders for that alias.
+                      Rules are applied to your Supamail ID. If an incoming email matches a pattern, we take the specified action.
+                      You can use partial matches like <code className="text-indigo-400 bg-white/5 px-1.5 py-0.5 rounded text-xs font-bold">@gmail.com</code> to block all Gmail senders.
                    </p>
                 </div>
              </div>

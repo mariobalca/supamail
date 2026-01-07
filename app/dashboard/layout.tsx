@@ -24,7 +24,7 @@ export default function DashboardLayout({
 
   const navItems = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Aliases', href: '/dashboard/aliases', icon: Mail },
+    { name: 'Supamail ID', href: '/dashboard/id', icon: Mail },
     { name: 'Rules', href: '/dashboard/rules', icon: Shield },
     { name: 'Activity', href: '/dashboard/logs', icon: History },
   ];
@@ -41,17 +41,10 @@ export default function DashboardLayout({
             <div className="bg-indigo-600 p-2 rounded-xl group-hover:rotate-12 transition-all duration-300 shadow-lg shadow-indigo-100">
               <Mail className="text-white w-5 h-5" />
             </div>
-            <span className="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">Supermail</span>
+            <span className="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">Supamail</span>
           </Link>
           <button onClick={() => setSidebarOpen(false)} className="md:hidden text-slate-400 hover:text-slate-900">
             <Menu className="w-6 h-6" />
-          </button>
-        </div>
-
-        <div className="px-6 mb-8">
-          <button className="flex items-center gap-2 w-full bg-slate-900 text-white px-4 py-3 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 active:scale-95 group">
-            <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
-            New Alias
           </button>
         </div>
 

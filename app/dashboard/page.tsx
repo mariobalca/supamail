@@ -1,9 +1,9 @@
 'use client';
 
-import { Mail, Shield, History, ArrowUpRight, Plus, Sparkles, TrendingUp, Clock, Loader2 } from 'lucide-react';
+import { Mail, Shield, History, ArrowUpRight, Plus, Sparkles, TrendingUp, Clock, Loader2, User as UserIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { getAliases, getAllRules, getLogs } from '@/lib/db';
+import { getAllRules, getLogs, getProfile } from '@/lib/db';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState([
@@ -16,14 +16,21 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const [aliases, rules, logs] = await Promise.all([
-          getAliases(),
+        const [rules, logs, profileData] = await Promise.all([
           getAllRules(),
-          getLogs()
+          getLogs(),
+          getProfile()
         ]);
 
         setStats([
-          { name: 'Active Aliases', value: aliases.filter(a => a.is_active).length.toString(), icon: Mail, color: 'text-indigo-600', bg: 'bg-indigo-50', trend: `+${aliases.length}%` },
+          {
+            name: 'Supamail ID',
+            value: profileData?.username ? `${profileData.username}@${process.env.NEXT_PUBLIC_MAILGUN_DOMAIN || 'supamail.mariobalca.com'}` : 'Not set',
+            icon: Mail,
+            color: 'text-indigo-600',
+            bg: 'bg-indigo-50',
+            trend: profileData?.username ? 'Active' : 'Setup required'
+          },
           { name: 'Active Rules', value: rules.length.toString(), icon: Shield, color: 'text-emerald-600', bg: 'bg-emerald-50', trend: `+${rules.length}%` },
           { name: 'Total Emails', value: logs.length.toString(), icon: History, color: 'text-amber-600', bg: 'bg-amber-50', trend: `+${logs.length}%` },
         ]);
@@ -46,18 +53,11 @@ export default function DashboardPage() {
         </div>
         <div className="flex items-center gap-3">
           <Link
-            href="/dashboard/logs"
-            className="flex items-center gap-2 bg-white text-slate-900 px-5 py-2.5 rounded-xl font-bold border border-slate-200 hover:bg-slate-50 transition-all shadow-sm active:scale-95"
-          >
-            <Clock size={18} className="text-slate-400" />
-            View History
-          </Link>
-          <Link
-            href="/dashboard/aliases"
+            href="/dashboard/id"
             className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 active:scale-95 group"
           >
-            <Plus size={20} className="group-hover:rotate-90 transition-transform" />
-            Create Alias
+            <UserIcon size={20} className="group-hover:scale-110 transition-transform" />
+            Manage ID
           </Link>
         </div>
       </div>
@@ -105,9 +105,9 @@ export default function DashboardPage() {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { step: "1", text: "Create Alias" },
+                { step: "1", text: "Claim your ID" },
                 { step: "2", text: "Set Rules" },
-                { step: "3", text: "Get Insights" }
+                { step: "3", text: "Receive Mail" }
               ].map((item, i) => (
                 <div key={i} className="bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-2xl flex flex-col gap-3 group-hover:bg-white/10 transition-colors">
                   <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-xs font-black shadow-lg shadow-indigo-900/20">{item.step}</div>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
 
             <div className="space-y-4">
               {[
-                "How to create aliases",
+                "How to claim your ID",
                 "Advanced rule patterns",
                 "Mailgun configuration",
                 "AI summary settings"

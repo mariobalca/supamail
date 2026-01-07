@@ -38,7 +38,7 @@ export default function LogsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-2">Activity</h1>
-          <p className="text-slate-500 font-medium">Monitor your incoming email traffic and AI insights.</p>
+          <p className="text-slate-500 font-medium">Monitor incoming traffic to your Supamail address.</p>
         </div>
         <button 
           onClick={fetchLogs}
@@ -85,7 +85,7 @@ export default function LogsPage() {
               </div>
               <div>
                 <p className="font-bold text-slate-900">No activity yet</p>
-                <p className="text-sm font-medium">Emails sent to your aliases will appear here.</p>
+                <p className="text-sm font-medium">Emails sent to your Supamail address will appear here.</p>
               </div>
             </div>
           ) : (
@@ -119,7 +119,7 @@ export default function LogsPage() {
                       <td className="px-6 py-6">
                         <div className="flex items-center gap-2 text-indigo-600">
                           <Mail size={14} className="opacity-50" />
-                          <span className="text-xs font-bold">{log.aliases?.address}</span>
+                          <span className="text-xs font-bold">To: {log.aliases?.address}</span>
                         </div>
                       </td>
                       <td className="px-6 py-6">
