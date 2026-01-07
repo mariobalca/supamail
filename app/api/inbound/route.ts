@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAliasWithUser, getRulesForAlias, logEmailActivity } from '@/lib/db';
+import { getAliasWithUser, getRulesForAlias, logEmailActivity } from '@/lib/db.server';
 import { verifySignature, forwardEmail } from '@/lib/mailgun';
 import { generateSmartSubject } from '@/lib/ai';
 import { Rule } from '@/types/database';

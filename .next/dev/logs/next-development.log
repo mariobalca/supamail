@@ -1,0 +1,18 @@
+[00:00:00.537] Server  WARN    ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+[00:00:00.615] Server  LOG     ✓ Ready in 398ms
+[00:00:01.932] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:02.046] Browser ERROR   uncaughtError: Error: supabaseKey is required.
+[00:00:02.813] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:02.934] Browser ERROR   uncaughtError: Error: supabaseKey is required.
+[00:00:04.539] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:04.658] Browser ERROR   uncaughtError: Error: supabaseKey is required.
+[00:00:41.368] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:41.483] Browser ERROR   uncaughtError: Error: supabaseKey is required.
+[00:01:35.145] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:01:35.146] Server  WARN    ⚠ Fast Refresh had to perform a full reload when ./lib/db.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:01:35.146] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:01:35.156] Server  LOG     ✓ Compiled in 127ms
+[00:01:35.695] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:37.907] Server  LOG     ✓ Compiled in 538ms
+[00:02:21.589] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:02:37.331] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold

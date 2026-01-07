@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getAliasWithUser, getRulesForAlias, logEmailActivity } from '@/lib/db';
+import { getAliasWithUser, getRulesForAlias, logEmailActivity } from '@/lib/db.server';
 
 vi.mock('@/lib/supabase/admin', () => {
   const mockSupabase = {

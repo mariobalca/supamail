@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST } from '@/app/api/inbound/route';
 import { NextRequest } from 'next/server';
-import * as db from '@/lib/db';
+import * as db from '@/lib/db.server';
 import * as mailgun from '@/lib/mailgun';
 import * as ai from '@/lib/ai';
 
@@ -11,7 +11,7 @@ vi.mock('@/lib/supabase/admin', () => ({
   },
 }));
 
-vi.mock('@/lib/db');
+vi.mock('@/lib/db.server');
 vi.mock('@/lib/mailgun');
 vi.mock('@/lib/ai');
 

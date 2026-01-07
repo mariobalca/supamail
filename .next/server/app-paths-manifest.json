@@ -1,0 +1,12 @@
+{
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/inbound/route": "app/api/inbound/route.js",
+  "/auth/callback/route": "app/auth/callback/route.js",
+  "/dashboard/aliases/page": "app/dashboard/aliases/page.js",
+  "/dashboard/logs/page": "app/dashboard/logs/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/rules/page": "app/dashboard/rules/page.js",
+  "/page": "app/page.js"
+}
