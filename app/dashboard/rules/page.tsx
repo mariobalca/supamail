@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import {
   Shield,
   Plus,
@@ -55,7 +55,7 @@ export default function RulesPage() {
     }
   };
 
-  const handleCreateRule = async (e: React.FormEvent) => {
+  const handleCreateRule = async (e: FormEvent) => {
     e.preventDefault();
     if (!pattern) return;
 

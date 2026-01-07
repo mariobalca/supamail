@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import {
   Loader2,
   User as UserIcon,
@@ -46,7 +46,7 @@ export default function SupamailIDPage() {
     }
   };
 
-  const handleUpdateUsername = async (e: React.FormEvent) => {
+  const handleUpdateUsername = async (e: FormEvent) => {
     e.preventDefault();
     if (!username) return;
 
