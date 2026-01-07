@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { SmartSubject } from '@/types/ai';
+import { getAllCategories, getOrCreateCategory } from '@/lib/db.server';
 
 let openaiInstance: OpenAI | null = null;
 
@@ -18,13 +19,19 @@ export const generateSmartSubject = async (
 ): Promise<SmartSubject> => {
   try {
     const openai = getOpenAI();
+    const existingCategories = await getAllCategories();
+
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
-          content:
-            'You are an email assistant. Analyze the email and return a JSON object with two fields: "summary" (a 3-5 word summary for a subject line prefix) and "category" (choose one: "Personal", "Social", "Promotions", "Updates", "Transactional", "Spam").',
+          content: `You are an email assistant. Analyze the email and return a JSON object with two fields: 
+"summary" (a 3-5 word summary for a subject line prefix) and 
+"category" (the most appropriate category for this email).
+
+Existing categories are: ${existingCategories.join(', ')}.
+If one of the existing categories matches, use it. If not, suggest a new, concise category name (1-2 words).`,
         },
         {
           role: 'user',
@@ -36,10 +43,10 @@ export const generateSmartSubject = async (
     });
 
     const content = response.choices[0]?.message?.content || '{}';
-    const { summary, category } = JSON.parse(content);
+    const { summary, category: rawCategory } = JSON.parse(content);
 
     const finalSummary = summary || 'Summary';
-    const finalCategory = category || 'Updates';
+    const finalCategory = await getOrCreateCategory(rawCategory || 'Updates');
 
     return {
       summary: finalSummary,

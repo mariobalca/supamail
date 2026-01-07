@@ -137,6 +137,102 @@ describe('Inbound API Route', () => {
     expect(mailgun.forwardEmail).not.toHaveBeenCalled();
   });
 
+  it('should allow email if whitelisted email overrides blocked domain', async () => {
+    const mockUser = { id: 'u1', username: 'mario', email: 'mario@real.com' };
+    const mockRules = [
+      { action: 'block', pattern: 'spam.com', type: 'domain' },
+      { action: 'allow', pattern: 'good@spam.com', type: 'email' },
+    ];
+
+    vi.mocked(mailgun.verifySignature).mockReturnValue(true);
+    vi.mocked(db.getUserBySupamailAddress).mockResolvedValue(mockUser as any);
+    vi.mocked(db.getRulesForUser).mockResolvedValue(mockRules as any);
+    vi.mocked(ai.generateSmartSubject).mockResolvedValue({
+      summary: 'Summary',
+      enhancedSubject: '[Summary] Hi',
+      category: 'Personal',
+    });
+
+    const req = createMockRequest({
+      from: 'good@spam.com',
+      recipient: 'mario@supamail.mariobalca.com',
+      subject: 'Hi',
+      timestamp: '123',
+      token: 'abc',
+      signature: 'sig',
+    });
+
+    const response = await POST(req);
+    const json = await response.json();
+
+    expect(json.message).toBe('Email forwarded');
+    expect(mailgun.forwardEmail).toHaveBeenCalled();
+  });
+
+  it('should allow email if whitelisted domain overrides blocked category', async () => {
+    const mockUser = { id: 'u1', username: 'mario', email: 'mario@real.com' };
+    const mockRules = [
+      { action: 'block', pattern: 'Promotions', type: 'category' },
+      { action: 'allow', pattern: 'newsletter.com', type: 'domain' },
+    ];
+
+    vi.mocked(mailgun.verifySignature).mockReturnValue(true);
+    vi.mocked(db.getUserBySupamailAddress).mockResolvedValue(mockUser as any);
+    vi.mocked(db.getRulesForUser).mockResolvedValue(mockRules as any);
+    vi.mocked(ai.generateSmartSubject).mockResolvedValue({
+      summary: 'Promo',
+      enhancedSubject: '[Promo] Sale',
+      category: 'Promotions',
+    });
+
+    const req = createMockRequest({
+      from: 'info@newsletter.com',
+      recipient: 'mario@supamail.mariobalca.com',
+      subject: 'Sale',
+      timestamp: '123',
+      token: 'abc',
+      signature: 'sig',
+    });
+
+    const response = await POST(req);
+    const json = await response.json();
+
+    expect(json.message).toBe('Email forwarded');
+    expect(mailgun.forwardEmail).toHaveBeenCalled();
+  });
+
+  it('should block email if whitelisted category overridden by blocked domain', async () => {
+    const mockUser = { id: 'u1', username: 'mario', email: 'mario@real.com' };
+    const mockRules = [
+      { action: 'allow', pattern: 'Promotions', type: 'category' },
+      { action: 'block', pattern: 'evil.com', type: 'domain' },
+    ];
+
+    vi.mocked(mailgun.verifySignature).mockReturnValue(true);
+    vi.mocked(db.getUserBySupamailAddress).mockResolvedValue(mockUser as any);
+    vi.mocked(db.getRulesForUser).mockResolvedValue(mockRules as any);
+    vi.mocked(ai.generateSmartSubject).mockResolvedValue({
+      summary: 'Promo',
+      enhancedSubject: '[Promo] Sale',
+      category: 'Promotions',
+    });
+
+    const req = createMockRequest({
+      from: 'bad@evil.com',
+      recipient: 'mario@supamail.mariobalca.com',
+      subject: 'Sale',
+      timestamp: '123',
+      token: 'abc',
+      signature: 'sig',
+    });
+
+    const response = await POST(req);
+    const json = await response.json();
+
+    expect(json.message).toBe('Email blocked');
+    expect(mailgun.forwardEmail).not.toHaveBeenCalled();
+  });
+
   it('should return 401 for invalid signature', async () => {
     vi.mocked(mailgun.verifySignature).mockReturnValue(false);
 

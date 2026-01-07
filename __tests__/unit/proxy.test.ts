@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { proxy } from '@/proxy';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
 vi.mock('@supabase/ssr', () => ({
   createServerClient: vi.fn(),

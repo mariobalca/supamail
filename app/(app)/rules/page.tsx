@@ -12,7 +12,7 @@ import {
   CheckCircle2,
   XCircle,
 } from 'lucide-react';
-import { getAllRules, createRule, deleteRule, getProfile } from '@/lib/db';
+import { getAllRules, createRule, deleteRule, getProfile, getCategories } from '@/lib/db';
 import { Rule, User, RuleType } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,12 +28,14 @@ import { Badge } from '@/components/ui/badge';
 export default function RulesPage() {
   const [rules, setRules] = useState<Rule[]>([]);
   const [profile, setProfile] = useState<User | null>(null);
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Form state
   const [pattern, setPattern] = useState('');
+  const [customCategory, setCustomCategory] = useState('');
   const [action, setAction] = useState<'allow' | 'block'>('block');
   const [type, setType] = useState<RuleType>('domain');
 
@@ -43,12 +45,14 @@ export default function RulesPage() {
 
   const fetchData = async () => {
     try {
-      const [rulesData, profileData] = await Promise.all([
+      const [rulesData, profileData, categoriesData] = await Promise.all([
         getAllRules(),
         getProfile(),
+        getCategories(),
       ]);
       setRules(rulesData);
       setProfile(profileData);
+      setCategories(categoriesData);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -58,12 +62,14 @@ export default function RulesPage() {
 
   const handleCreateRule = async (e: FormEvent) => {
     e.preventDefault();
-    if (!pattern) return;
+    const finalPattern = type === 'category' ? (pattern === 'custom' ? customCategory : pattern) : pattern;
+    if (!finalPattern) return;
 
     setIsCreating(true);
     try {
-      await createRule(pattern, action, type);
+      await createRule(finalPattern, action, type);
       setPattern('');
+      setCustomCategory('');
       fetchData();
     } catch (error) {
       console.error('Error creating rule:', error);
@@ -145,21 +151,46 @@ export default function RulesPage() {
                       ? 'Domain (e.g. amazon.com)'
                       : type === 'email'
                         ? 'Email Address'
-                        : 'Category Name'}
+                        : 'Category'}
                   </label>
-                  <Input
-                    type="text"
-                    placeholder={
-                      type === 'domain'
-                        ? 'e.g. news.google.com'
-                        : type === 'email'
-                          ? 'e.g. info@newsletter.com'
-                          : 'e.g. Promotions'
-                    }
-                    value={pattern}
-                    onChange={(e) => setPattern(e.target.value)}
-                    disabled={isCreating}
-                  />
+                  {type === 'category' ? (
+                    <div className="space-y-2">
+                      <select
+                        value={pattern}
+                        onChange={(e) => setPattern(e.target.value)}
+                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      >
+                        <option value="">Select a category...</option>
+                        {categories.map((cat) => (
+                          <option key={cat} value={cat}>
+                            {cat}
+                          </option>
+                        ))}
+                        <option value="custom">+ Create new category...</option>
+                      </select>
+                      {pattern === 'custom' && (
+                        <Input
+                          type="text"
+                          placeholder="Type new category name..."
+                          value={customCategory}
+                          onChange={(e) => setCustomCategory(e.target.value)}
+                          required
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <Input
+                      type="text"
+                      placeholder={
+                        type === 'domain'
+                          ? 'e.g. news.google.com'
+                          : 'e.g. info@newsletter.com'
+                      }
+                      value={pattern}
+                      onChange={(e) => setPattern(e.target.value)}
+                      disabled={isCreating}
+                    />
+                  )}
                 </div>
 
                 <div>
@@ -322,15 +353,32 @@ export default function RulesPage() {
                 <h4 className="mb-1.5 text-lg font-black tracking-tight">
                   How rules work
                 </h4>
-                <p className="text-xs font-medium leading-relaxed text-slate-400">
-                  Rules are applied to your Supamail ID. If an incoming email
-                  matches a pattern, we take the specified action. You can use
-                  partial matches like{' '}
-                  <code className="rounded bg-white/5 px-1 py-0.5 text-[10px] font-bold text-indigo-400">
-                    @gmail.com
-                  </code>{' '}
-                  to block all Gmail senders.
-                </p>
+                <div className="space-y-3 text-xs font-medium leading-relaxed text-slate-400">
+                  <p>
+                    Rules are applied to your Supamail ID based on a strict
+                    precedence hierarchy:
+                  </p>
+                  <ol className="list-decimal space-y-1.5 pl-4">
+                    <li>
+                      <span className="font-bold text-white">Email Rules:</span>{' '}
+                      Specific addresses override everything else.
+                    </li>
+                    <li>
+                      <span className="font-bold text-white">Domain Rules:</span>{' '}
+                      Matches like <code className="text-indigo-400">@gmail.com</code> override categories.
+                    </li>
+                    <li>
+                      <span className="font-bold text-white">
+                        Category Rules:
+                      </span>{' '}
+                      AI-driven categorization is applied last.
+                    </li>
+                  </ol>
+                  <p className="border-t border-white/5 pt-3">
+                    Whitelisted rules always override blocked rules at the same
+                    or lower specificity level.
+                  </p>
+                </div>
               </div>
             </CardContent>
             <div className="absolute right-0 top-0 -mr-16 -mt-16 h-32 w-32 rounded-full bg-indigo-600/20 blur-[60px]" />

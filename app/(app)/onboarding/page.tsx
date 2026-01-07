@@ -12,8 +12,8 @@ import {
   Sparkles,
   ArrowRight,
 } from 'lucide-react';
-import { getProfile, updateUsername, createRule } from '@/lib/db';
-import { User } from '@/types/database';
+import { getProfile, updateUsername, createRule, getCategories } from '@/lib/db';
+import { RuleType } from '@/types/database';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -31,23 +31,32 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [rules, setRules] = useState<{ pattern: string; action: 'allow' | 'block' }[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [rules, setRules] = useState<
+    { pattern: string; action: 'allow' | 'block'; type: RuleType }[]
+  >([]);
   const [currentPattern, setCurrentPattern] = useState('');
+  const [currentType, setCurrentType] = useState<RuleType>('domain');
+  const [customCategory, setCustomCategory] = useState('');
 
   useEffect(() => {
-    async function checkProfile() {
+    async function initOnboarding() {
       try {
-        const profile = await getProfile();
+        const [profile, categoriesData] = await Promise.all([
+          getProfile(),
+          getCategories(),
+        ]);
         if (profile?.username) {
           router.push('/home');
         }
+        setCategories(categoriesData);
       } catch (error) {
-        console.error('Error checking profile:', error);
+        console.error('Error initializing onboarding:', error);
       } finally {
         setLoading(false);
       }
     }
-    checkProfile();
+    initOnboarding();
   }, [router]);
 
   const handleSetUsername = async (e: FormEvent) => {
@@ -57,9 +66,20 @@ export default function OnboardingPage() {
   };
 
   const addRule = () => {
-    if (!currentPattern) return;
-    setRules([...rules, { pattern: currentPattern, action: 'block' }]);
+    const finalPattern =
+      currentType === 'category'
+        ? currentPattern === 'custom'
+          ? customCategory
+          : currentPattern
+        : currentPattern;
+    if (!finalPattern) return;
+
+    setRules([
+      ...rules,
+      { pattern: finalPattern, action: 'block', type: currentType },
+    ]);
     setCurrentPattern('');
+    setCustomCategory('');
   };
 
   const removeRule = (index: number) => {
@@ -74,7 +94,7 @@ export default function OnboardingPage() {
 
       // 2. Create rules
       for (const rule of rules) {
-        await createRule(rule.pattern, rule.action);
+        await createRule(rule.pattern, rule.action, rule.type);
       }
 
       router.push('/home');
@@ -177,7 +197,7 @@ export default function OnboardingPage() {
                 <div>
                   <CardTitle>Set your first rules</CardTitle>
                   <CardDescription>
-                    Add some domains or emails you want to block right away.
+                    Choose what you want to block by default.
                   </CardDescription>
                 </div>
                 <Badge variant="primary" className="h-fit">
@@ -186,17 +206,87 @@ export default function OnboardingPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex gap-2">
-                <Input
-                  type="text"
-                  placeholder="e.g. newsletter.com"
-                  value={currentPattern}
-                  onChange={(e) => setCurrentPattern(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && addRule()}
-                />
-                <Button variant="outline" onClick={addRule} type="button">
-                  <Plus className="h-4 w-4" />
-                </Button>
+              <div className="space-y-4">
+                <div>
+                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                    Rule Type
+                  </label>
+                  <div className="flex gap-2">
+                    {(['domain', 'email', 'category'] as RuleType[]).map(
+                      (t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => {
+                            setCurrentType(t);
+                            setCurrentPattern('');
+                          }}
+                          className={`flex-1 rounded-lg border px-3 py-1.5 text-[10px] font-bold transition-all ${
+                            currentType === t
+                              ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                              : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
+                          }`}
+                        >
+                          {t.charAt(0).toUpperCase() + t.slice(1)}
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <div className="flex-1 space-y-2">
+                    {currentType === 'category' ? (
+                      <>
+                        <select
+                          value={currentPattern}
+                          onChange={(e) => setCurrentPattern(e.target.value)}
+                          className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                        >
+                          <option value="">Select a category...</option>
+                          {categories.map((cat) => (
+                            <option key={cat} value={cat}>
+                              {cat}
+                            </option>
+                          ))}
+                          <option value="custom">
+                            + Create new category...
+                          </option>
+                        </select>
+                        {currentPattern === 'custom' && (
+                          <Input
+                            type="text"
+                            placeholder="Type new category name..."
+                            value={customCategory}
+                            onChange={(e) => setCustomCategory(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && addRule()}
+                            autoFocus
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <Input
+                        type="text"
+                        placeholder={
+                          currentType === 'domain'
+                            ? 'e.g. newsletter.com'
+                            : 'e.g. spam@service.com'
+                        }
+                        value={currentPattern}
+                        onChange={(e) => setCurrentPattern(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && addRule()}
+                      />
+                    )}
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={addRule}
+                    type="button"
+                    className="h-10"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
 
               <div className="space-y-3">
@@ -211,8 +301,17 @@ export default function OnboardingPage() {
                           <Shield size={16} />
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-slate-900">{rule.pattern}</p>
-                          <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Blocked</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-bold text-slate-900">
+                              {rule.pattern}
+                            </p>
+                            <Badge variant="outline" className="h-fit">
+                              {rule.type}
+                            </Badge>
+                          </div>
+                          <p className="text-[10px] font-medium tracking-widest text-slate-400 uppercase">
+                            Blocked
+                          </p>
                         </div>
                       </div>
                       <Button
@@ -226,7 +325,7 @@ export default function OnboardingPage() {
                     </div>
                   ))
                 ) : (
-                  <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 py-12 text-slate-400">
+                  <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 py-8 text-slate-400">
                     <Sparkles className="h-8 w-8 opacity-20" />
                     <p className="text-xs font-medium">No rules added yet.</p>
                   </div>

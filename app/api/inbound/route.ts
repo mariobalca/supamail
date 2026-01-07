@@ -45,23 +45,38 @@ export async function POST(req: NextRequest) {
     // 4. Check Rules (Whitelist/Blacklist/Category)
     const rules = await getRulesForUser(user.id);
 
-    // Advanced matching logic
-    const isBlocked = rules?.some((rule: Rule) => {
-      if (rule.action !== 'block') return false;
+    // Precedence Logic:
+    // 1. Specific Email rules override everything else.
+    // 2. Domain rules override Category rules.
+    // 3. 'allow' action overrides 'block' within the same or lower specificity level.
 
-      if (rule.type === 'category') {
-        return rule.pattern.toLowerCase() === category.toLowerCase();
-      }
+    let finalAction: 'allow' | 'block' = 'allow'; // Default to allow
 
-      if (rule.type === 'email') {
-        return sender.toLowerCase() === rule.pattern.toLowerCase();
-      }
+    // Categorize rules by type
+    const emailRules = rules.filter(r => r.type === 'email');
+    const domainRules = rules.filter(r => r.type === 'domain');
+    const categoryRules = rules.filter(r => r.type === 'category');
 
-      // Default: domain matching
+    const matchesRule = (rule: Rule) => {
+      if (rule.type === 'email') return sender.toLowerCase() === rule.pattern.toLowerCase();
+      if (rule.type === 'category') return rule.pattern.toLowerCase() === category.toLowerCase();
       return sender.toLowerCase().includes(rule.pattern.toLowerCase());
-    });
+    };
 
-    if (isBlocked) {
+    // Find if any rule matches at each level
+    const matchedEmailRule = emailRules.find(matchesRule);
+    const matchedDomainRule = domainRules.find(matchesRule);
+    const matchedCategoryRule = categoryRules.find(matchesRule);
+
+    if (matchedEmailRule) {
+      finalAction = matchedEmailRule.action;
+    } else if (matchedDomainRule) {
+      finalAction = matchedDomainRule.action;
+    } else if (matchedCategoryRule) {
+      finalAction = matchedCategoryRule.action;
+    }
+
+    if (finalAction === 'block') {
       await logEmailActivity({
         user_id: user.id,
         sender,

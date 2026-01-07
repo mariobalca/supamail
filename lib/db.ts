@@ -1,5 +1,5 @@
 import { createClient } from './supabase/client';
-import { Rule, Log, User, RuleType, LogStatus } from '@/types/database';
+import { Rule, Log, User, RuleType } from '@/types/database';
 
 export const getProfile = async (): Promise<User | null> => {
   const supabase = createClient();
@@ -81,4 +81,15 @@ export const getLogs = async (): Promise<Log[]> => {
 
   if (error) throw error;
   return data || [];
+};
+
+export const getCategories = async (): Promise<string[]> => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('categories')
+    .select('name')
+    .order('name', { ascending: true });
+
+  if (error) throw error;
+  return (data || []).map((c) => c.name);
 };

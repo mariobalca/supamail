@@ -29,6 +29,11 @@ vi.mock('openai', () => {
   };
 });
 
+vi.mock('@/lib/db.server', () => ({
+  getAllCategories: vi.fn().mockResolvedValue(['Personal', 'Social']),
+  getOrCreateCategory: vi.fn().mockImplementation((name) => Promise.resolve(name)),
+}));
+
 describe('AI Service', () => {
   it('should generate an enhanced subject and category', async () => {
     const result = await generateSmartSubject(

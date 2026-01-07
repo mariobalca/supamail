@@ -63,3 +63,44 @@ export const updateLogStatus = async (id: string, status: LogStatus) => {
 
   if (error) throw error;
 };
+
+export const getAllCategories = async (): Promise<string[]> => {
+  const { data, error } = await supabaseAdmin
+    .from('categories')
+    .select('name')
+    .order('name', { ascending: true });
+
+  if (error || !data) return [];
+  return data.map((c) => c.name);
+};
+
+export const getOrCreateCategory = async (name: string): Promise<string> => {
+  // First, check if it exists (case-insensitive-ish or exact)
+  const { data, error } = await supabaseAdmin
+    .from('categories')
+    .select('name')
+    .eq('name', name)
+    .maybeSingle();
+
+  if (data) return data.name;
+
+  // If not found, insert it
+  const { data: newData, error: insertError } = await supabaseAdmin
+    .from('categories')
+    .insert({ name })
+    .select('name')
+    .single();
+
+  if (insertError) {
+    // Possibly a race condition where it was just inserted
+    const { data: retryData } = await supabaseAdmin
+      .from('categories')
+      .select('name')
+      .eq('name', name)
+      .single();
+    if (retryData) return retryData.name;
+    throw insertError;
+  }
+
+  return newData.name;
+};

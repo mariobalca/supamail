@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import {
   History,
   Search,
-  Mail,
   Loader2,
   CheckCircle2,
   XCircle,

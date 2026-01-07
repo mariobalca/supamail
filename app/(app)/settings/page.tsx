@@ -3,7 +3,6 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import {
   Loader2,
-  User as UserIcon,
   Check,
   Lock,
   CreditCard,
