@@ -45,26 +45,26 @@ export default function LandingPage() {
                 <Sparkles className="w-3.5 h-3.5" />
                 Now with AI Smart-Digest
               </div>
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-8 text-slate-900 leading-[1.1]">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6 text-slate-900 leading-[1.1]">
                 Own your inbox. <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
                   Defeat the noise.
                 </span>
               </h1>
-              <p className="text-lg md:text-xl text-slate-500 mb-12 leading-relaxed max-w-2xl mx-auto font-medium">
+              <p className="text-base md:text-lg text-slate-500 mb-10 leading-relaxed max-w-xl mx-auto font-medium">
                 Create secure aliases for every service. Filter unwanted senders with ease and get AI-powered insights before you even open an email.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
                 <Link
                   href="/login"
-                  className="w-full sm:w-auto px-8 py-5 bg-indigo-600 text-white rounded-2xl font-bold text-lg hover:bg-indigo-700 transition-all shadow-2xl shadow-indigo-200 flex items-center justify-center gap-3 group active:scale-[0.98]"
+                  className="w-full sm:w-auto px-6 py-4 bg-indigo-600 text-white rounded-xl font-bold text-base hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 flex items-center justify-center gap-2 group active:scale-[0.98]"
                 >
                   Create Your First Alias
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   href="/dashboard"
-                  className="w-full sm:w-auto px-8 py-5 bg-white text-slate-900 border border-slate-200 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all flex items-center justify-center gap-2 shadow-sm active:scale-[0.98]"
+                  className="w-full sm:w-auto px-6 py-4 bg-white text-slate-900 border border-slate-200 rounded-xl font-bold text-base hover:bg-slate-50 transition-all flex items-center justify-center gap-2 shadow-sm active:scale-[0.98]"
                 >
                   Explore Dashboard
                 </Link>
@@ -102,7 +102,7 @@ export default function LandingPage() {
               <h3 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">Everything you need to <br />take back control.</h3>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-6">
               {[
                 {
                   title: "Alias Management",
@@ -123,12 +123,12 @@ export default function LandingPage() {
                   color: "bg-violet-50 text-violet-600"
                 }
               ].map((feat, i) => (
-                <div key={i} className="group p-8 rounded-3xl bg-slate-50 border border-transparent hover:border-indigo-100 hover:bg-white hover:shadow-2xl hover:shadow-indigo-100/50 transition-all duration-500">
-                  <div className={`w-14 h-14 ${feat.color} rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500`}>
-                    <feat.icon className="w-7 h-7" />
+                <div key={i} className="group p-6 rounded-2xl bg-slate-50 border border-transparent hover:border-indigo-100 hover:bg-white hover:shadow-2xl hover:shadow-indigo-100/50 transition-all duration-500">
+                  <div className={`w-12 h-12 ${feat.color} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500`}>
+                    <feat.icon className="w-6 h-6" />
                   </div>
-                  <h4 className="text-2xl font-bold mb-4 text-slate-900">{feat.title}</h4>
-                  <p className="text-slate-500 leading-relaxed font-medium">
+                  <h4 className="text-xl font-bold mb-3 text-slate-900">{feat.title}</h4>
+                  <p className="text-slate-500 text-sm leading-relaxed font-medium">
                     {feat.desc}
                   </p>
                 </div>
@@ -138,18 +138,18 @@ export default function LandingPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-24 px-6">
-          <div className="max-w-5xl mx-auto rounded-[3rem] bg-slate-900 p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
+        <section className="py-20 px-6">
+          <div className="max-w-5xl mx-auto rounded-[2rem] bg-slate-900 p-10 md:p-16 text-center relative overflow-hidden shadow-2xl">
             <div className="relative z-10">
-              <h2 className="text-3xl md:text-5xl font-black text-white mb-8 tracking-tight leading-tight">
+              <h2 className="text-2xl md:text-4xl font-black text-white mb-6 tracking-tight leading-tight">
                 Ready to make your primary <br className="hidden md:block" />email private again?
               </h2>
               <Link
                 href="/login"
-                className="inline-flex items-center gap-3 px-10 py-5 bg-white text-slate-900 rounded-2xl font-bold text-xl hover:bg-slate-100 transition-all active:scale-95"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-slate-900 rounded-xl font-bold text-lg hover:bg-slate-100 transition-all active:scale-95"
               >
                 Join Supamail Now
-                <ArrowRight className="w-6 h-6" />
+                <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
             {/* Background elements for CTA */}
