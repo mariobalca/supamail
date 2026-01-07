@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAliasWithUser, getRulesForAlias, logEmailActivity } from '@/lib/db';
+import {
+  getUserBySupamailAddress,
+  getRulesForUser,
+  logEmailActivity,
+} from '@/lib/db.server';
 import { verifySignature, forwardEmail } from '@/lib/mailgun';
 import { generateSmartSubject } from '@/lib/ai';
 import { Rule } from '@/types/database';
@@ -22,37 +26,43 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
-    // 2. Find Alias
-    const alias = await getAliasWithUser(recipient);
+    // 2. Find User by Supamail Address
+    const user = await getUserBySupamailAddress(recipient);
 
-    if (!alias) {
-      return NextResponse.json({ error: 'Alias not found' }, { status: 404 });
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Recipient not found' },
+        { status: 404 }
+      );
     }
 
     // 3. Check Rules (Whitelist/Blacklist)
-    const rules = await getRulesForAlias(alias.id);
+    const rules = await getRulesForUser(user.id);
 
     // Simple matching logic
-    const isBlocked = rules?.some((rule: Rule) =>
-      rule.action === 'block' && sender.includes(rule.pattern)
+    const isBlocked = rules?.some(
+      (rule: Rule) => rule.action === 'block' && sender.includes(rule.pattern)
     );
 
     if (isBlocked) {
       await logEmailActivity({
-        alias_id: alias.id,
+        user_id: user.id,
         sender,
         subject,
-        status: 'blocked'
+        status: 'blocked',
       });
       return NextResponse.json({ message: 'Email blocked' });
     }
 
     // 4. AI Feature: Generate Smart Subject/Summary
-    const { summary, enhancedSubject } = await generateSmartSubject(subject, bodyPlain || bodyHtml);
+    const { summary, enhancedSubject } = await generateSmartSubject(
+      subject,
+      bodyPlain || bodyHtml
+    );
 
     // 5. Forward Email via Mailgun
     await forwardEmail(
-      alias.users.email,
+      user.email,
       sender,
       enhancedSubject,
       bodyHtml,
@@ -61,11 +71,11 @@ export async function POST(req: NextRequest) {
 
     // 6. Log Success
     await logEmailActivity({
-      alias_id: alias.id,
+      user_id: user.id,
       sender,
       subject,
       ai_summary: summary,
-      status: 'forwarded'
+      status: 'forwarded',
     });
 
     return NextResponse.json({ message: 'Email forwarded' });

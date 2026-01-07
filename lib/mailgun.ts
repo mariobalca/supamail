@@ -11,12 +11,17 @@ const getMailgunClient = () => {
     mgInstance = mailgun.client({
       username: 'api',
       key: process.env.MAILGUN_API_KEY || 'dummy-key',
+      url: process.env.MAILGUN_URL || 'https://api.eu.mailgun.net', // Support EU region
     });
   }
   return mgInstance;
 };
 
-export const verifySignature = (timestamp: string, token: string, signature: string) => {
+export const verifySignature = (
+  timestamp: string,
+  token: string,
+  signature: string
+) => {
   const secret = process.env.MAILGUN_SIGNING_KEY || '';
   const encodedToken = crypto
     .createHmac('sha256', secret)
@@ -26,7 +31,13 @@ export const verifySignature = (timestamp: string, token: string, signature: str
   return encodedToken === signature;
 };
 
-export const forwardEmail = async (to: string, from: string, subject: string, html: string, text: string): Promise<ForwardEmailResult> => {
+export const forwardEmail = async (
+  to: string,
+  from: string,
+  subject: string,
+  html: string,
+  text: string
+): Promise<ForwardEmailResult> => {
   const domain = process.env.MAILGUN_DOMAIN || '';
   const mg = getMailgunClient();
 

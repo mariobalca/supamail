@@ -9,6 +9,7 @@ yarn-error.log*
 .pnp.js
 
 .DS_Store
+.output.txt
 
 .env
 .env.local
@@ -16,3 +17,4 @@ yarn-error.log*
 
 .idea/*
 .vscode/*
+.next/*
