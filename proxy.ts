@@ -2,9 +2,11 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function proxy(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,22 +14,24 @@ export async function proxy(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll()
+          return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
-          )
-          supabaseResponse = NextResponse.next({
-            request,
-          })
+          );
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
+            response.cookies.set(name, value, options)
+          );
         },
       },
     }
-  )
+  );
 
   const {
     data: { user },
@@ -47,47 +51,55 @@ export async function proxy(request: NextRequest) {
     isLogsPage;
 
   if (!user && isProtectedRoute && !isOnboardingPage) {
-    const url = new URL('/login', request.url)
-    const redirectResponse = NextResponse.redirect(url)
-    supabaseResponse.cookies.getAll().forEach((cookie) => {
-      redirectResponse.cookies.set(cookie.name, cookie.value)
-    })
-    return redirectResponse
+    const url = new URL('/login', request.url);
+    const redirectResponse = NextResponse.redirect(url);
+    // Copy cookies from current response to the redirect response
+    response.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value);
+    });
+    return redirectResponse;
   }
 
   if (user && (isHomePage || isSettingsPage || isRulesPage || isLogsPage)) {
+    // Check if user has a username
     const { data: profile } = await supabase
       .from('users')
       .select('username')
       .eq('id', user.id)
-      .single()
+      .single();
 
     if (!profile?.username) {
-      const url = new URL('/onboarding', request.url)
-      const redirectResponse = NextResponse.redirect(url)
-      supabaseResponse.cookies.getAll().forEach((cookie) => {
-        redirectResponse.cookies.set(cookie.name, cookie.value)
-      })
-      return redirectResponse
+      const url = new URL('/onboarding', request.url);
+      const redirectResponse = NextResponse.redirect(url);
+      // Copy cookies from current response to the redirect response
+      response.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie.name, cookie.value);
+      });
+      return redirectResponse;
     }
   }
 
   if (user && isOnboardingPage) {
+    // If they already have a username, don't let them go back to onboarding
     const { data: profile } = await supabase
       .from('users')
       .select('username')
       .eq('id', user.id)
-      .single()
+      .single();
 
     if (profile?.username) {
-      const url = new URL('/home', request.url)
-      const redirectResponse = NextResponse.redirect(url)
-      supabaseResponse.cookies.getAll().forEach((cookie) => {
-        redirectResponse.cookies.set(cookie.name, cookie.value)
-      })
-      return redirectResponse
+      const url = new URL('/home', request.url);
+      const redirectResponse = NextResponse.redirect(url);
+      // Copy cookies from current response to the redirect response
+      response.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie.name, cookie.value);
+      });
+      return redirectResponse;
     }
   }
 
-  return supabaseResponse;
+  // Add Vary header to help with downstream proxies (like DigitalOcean's)
+  response.headers.set('Vary', 'Accept');
+  
+  return response;
 }
