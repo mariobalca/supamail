@@ -48,7 +48,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 # Mailgun
-MAILGUN_DOMAIN=your_mailgun_domain
+NEXT_PUBLIC_MAILGUN_DOMAIN=your_mailgun_domain
 MAILGUN_API_KEY=your_mailgun_key
 MAILGUN_SIGNING_KEY=your_webhook_signing_key
 MAILGUN_URL=https://api.eu.mailgun.net # Optional: Use for EU region

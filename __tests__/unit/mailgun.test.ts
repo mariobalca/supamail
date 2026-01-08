@@ -46,7 +46,7 @@ describe('Mailgun Service', () => {
 
   describe('forwardEmail', () => {
     it('should call mailgun messages create', async () => {
-      process.env.MAILGUN_DOMAIN = 'test.com';
+      process.env.NEXT_PUBLIC_MAILGUN_DOMAIN = 'test.com';
       const result = await forwardEmail(
         'to@email.com',
         'from@email.com',

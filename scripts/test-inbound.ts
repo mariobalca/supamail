@@ -10,22 +10,22 @@ const API_URL = 'http://localhost:3000/api/inbound';
 
 const SCENARIOS = {
   personal: {
-    from: `friend@${process.env.MAILGUN_DOMAIN}`,
+    from: `friend@${process.env.NEXT_PUBLIC_MAILGUN_DOMAIN}`,
     subject: 'Catching up',
     body: 'Hey John, let us grab coffee soon!',
   },
   spam: {
-    from: `lottery@${process.env.MAILGUN_DOMAIN}`,
+    from: `lottery@${process.env.NEXT_PUBLIC_MAILGUN_DOMAIN}`,
     subject: 'YOU WON $1,000,000!!!',
     body: 'Click here to claim your prize now. Unsubscribe from this mailing list.',
   },
   promotion: {
-    from: `news@${process.env.MAILGUN_DOMAIN}`,
+    from: `news@${process.env.NEXT_PUBLIC_MAILGUN_DOMAIN}`,
     subject: 'Flash Sale: 50% Off Everything',
     body: 'Do not miss out on our biggest sale of the year. Shop now!',
   },
   transactional: {
-    from: `receipts@${process.env.MAILGUN_DOMAIN}`,
+    from: `receipts@${process.env.NEXT_PUBLIC_MAILGUN_DOMAIN}`,
     subject: 'Your order #12345 has shipped',
     body: 'Your package is on its way. Track it here.',
   },

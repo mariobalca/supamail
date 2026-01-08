@@ -4,7 +4,7 @@ import { User, Rule, LogStatus, Log as UserLog } from '@/types/database';
 export const getUserBySupamailAddress = async (
   address: string
 ): Promise<User | null> => {
-  const domain = process.env.MAILGUN_DOMAIN || 'supamail-domain.com';
+  const domain = process.env.NEXT_PUBLIC_MAILGUN_DOMAIN || 'supamail-domain.com';
   if (address.endsWith(`@${domain}`)) {
     const username = address.split('@')[0];
     const { data: userData, error: userError } = await supabaseAdmin

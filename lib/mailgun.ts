@@ -38,7 +38,7 @@ export const forwardEmail = async (
   html: string,
   text: string
 ): Promise<ForwardEmailResult> => {
-  const domain = process.env.MAILGUN_DOMAIN || '';
+  const domain = process.env.NEXT_PUBLIC_MAILGUN_DOMAIN || '';
   const mg = getMailgunClient();
 
   return mg.messages.create(domain, {
