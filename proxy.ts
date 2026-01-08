@@ -2,11 +2,9 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function proxy(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+  let supabaseResponse = NextResponse.next({
+    request,
+  })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,13 +18,11 @@ export async function proxy(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
+          supabaseResponse = NextResponse.next({
+            request,
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set({
+            supabaseResponse.cookies.set({
               name,
               value,
               ...options,
@@ -55,7 +51,13 @@ export async function proxy(request: NextRequest) {
     isLogsPage;
 
   if (!user && isProtectedRoute && !isOnboardingPage) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    const url = new URL('/login', request.url);
+    const redirectResponse = NextResponse.redirect(url);
+    // Copy cookies from supabaseResponse to the redirect response
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value);
+    });
+    return redirectResponse;
   }
 
   if (user && (isHomePage || isSettingsPage || isRulesPage || isLogsPage)) {
@@ -67,7 +69,13 @@ export async function proxy(request: NextRequest) {
       .single();
 
     if (!profile?.username) {
-      return NextResponse.redirect(new URL('/onboarding', request.url));
+      const url = new URL('/onboarding', request.url);
+      const redirectResponse = NextResponse.redirect(url);
+      // Copy cookies from supabaseResponse to the redirect response
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie.name, cookie.value);
+      });
+      return redirectResponse;
     }
   }
 
@@ -80,9 +88,15 @@ export async function proxy(request: NextRequest) {
       .single();
 
     if (profile?.username) {
-      return NextResponse.redirect(new URL('/home', request.url));
+      const url = new URL('/home', request.url);
+      const redirectResponse = NextResponse.redirect(url);
+      // Copy cookies from supabaseResponse to the redirect response
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie.name, cookie.value);
+      });
+      return redirectResponse;
     }
   }
 
-  return response;
+  return supabaseResponse;
 }
