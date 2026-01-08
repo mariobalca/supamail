@@ -3,10 +3,8 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  })
+    request,
+  });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,39 +12,46 @@ export async function proxy(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll()
+          return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
           response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
+            request,
+          });
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set({
               name,
               value,
               ...options,
             })
-          )
+          );
         },
       },
     }
-  )
+  );
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const isHomePage = request.nextUrl.pathname.startsWith('/home')
-  const isOnboardingPage = request.nextUrl.pathname.startsWith('/onboarding')
-  const isSettingsPage = request.nextUrl.pathname.startsWith('/settings')
-  const isRulesPage = request.nextUrl.pathname.startsWith('/rules')
-  const isLogsPage = request.nextUrl.pathname.startsWith('/logs')
+  const isHomePage = request.nextUrl.pathname.startsWith('/home');
+  const isOnboardingPage = request.nextUrl.pathname.startsWith('/onboarding');
+  const isSettingsPage = request.nextUrl.pathname.startsWith('/settings');
+  const isRulesPage = request.nextUrl.pathname.startsWith('/rules');
+  const isLogsPage = request.nextUrl.pathname.startsWith('/logs');
 
-  const isProtectedRoute = isHomePage || isOnboardingPage || isSettingsPage || isRulesPage || isLogsPage
+  const isProtectedRoute =
+    isHomePage ||
+    isOnboardingPage ||
+    isSettingsPage ||
+    isRulesPage ||
+    isLogsPage;
 
   if (!user && isProtectedRoute && !isOnboardingPage) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   if (user && (isHomePage || isSettingsPage || isRulesPage || isLogsPage)) {
@@ -55,10 +60,10 @@ export async function proxy(request: NextRequest) {
       .from('users')
       .select('username')
       .eq('id', user.id)
-      .single()
+      .single();
 
     if (!profile?.username) {
-      return NextResponse.redirect(new URL('/onboarding', request.url))
+      return NextResponse.redirect(new URL('/onboarding', request.url));
     }
   }
 
@@ -68,12 +73,12 @@ export async function proxy(request: NextRequest) {
       .from('users')
       .select('username')
       .eq('id', user.id)
-      .single()
+      .single();
 
     if (profile?.username) {
-      return NextResponse.redirect(new URL('/home', request.url))
+      return NextResponse.redirect(new URL('/home', request.url));
     }
   }
 
-  return response
+  return response;
 }
