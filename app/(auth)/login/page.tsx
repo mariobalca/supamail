@@ -101,7 +101,7 @@ export default function LoginPage() {
                 },
               }}
               providers={['google']}
-              redirectTo={`${getURL()}auth/callback`}
+              redirectTo={`${getURL()}/auth/callback`}
             />
           </div>
         </div>
