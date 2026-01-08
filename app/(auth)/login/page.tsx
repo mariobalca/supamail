@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { Mail, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { getURL } from '@/lib/utils';
 
 export default function LoginPage() {
   const supabase = createClient();
@@ -100,7 +101,7 @@ export default function LoginPage() {
                 },
               }}
               providers={['google']}
-              redirectTo={`${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`}
+              redirectTo={`${getURL()}auth/callback`}
             />
           </div>
         </div>
