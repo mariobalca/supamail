@@ -97,6 +97,8 @@ export default function OnboardingPage() {
         await createRule(rule.pattern, rule.action, rule.type);
       }
 
+      // Refresh to ensure middleware sees the updated username
+      router.refresh();
       router.push('/home');
     } catch (error) {
       console.error('Onboarding error:', error);
