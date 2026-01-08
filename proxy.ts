@@ -1,12 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function proxy(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+export async function updateSession(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({
+    request,
+  })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,92 +12,93 @@ export async function proxy(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll();
+          return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          supabaseResponse = NextResponse.next({
+            request,
+          })
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
+            supabaseResponse.cookies.set(name, value, options)
+          )
         },
       },
     }
-  );
+  )
+
+  // Do not run for static assets or api routes
+  if (
+    request.nextUrl.pathname.startsWith('/_next') ||
+    request.nextUrl.pathname.startsWith('/api') ||
+    request.nextUrl.pathname.startsWith('/auth') ||
+    request.nextUrl.pathname === '/favicon.ico' ||
+    request.nextUrl.pathname === '/'
+  ) {
+    return supabaseResponse
+  }
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
-
-  const isHomePage = request.nextUrl.pathname.startsWith('/home');
-  const isOnboardingPage = request.nextUrl.pathname.startsWith('/onboarding');
-  const isSettingsPage = request.nextUrl.pathname.startsWith('/settings');
-  const isRulesPage = request.nextUrl.pathname.startsWith('/rules');
-  const isLogsPage = request.nextUrl.pathname.startsWith('/logs');
+  } = await supabase.auth.getUser()
 
   const isProtectedRoute =
-    isHomePage ||
-    isOnboardingPage ||
-    isSettingsPage ||
-    isRulesPage ||
-    isLogsPage;
+    request.nextUrl.pathname.startsWith('/home') ||
+    request.nextUrl.pathname.startsWith('/onboarding') ||
+    request.nextUrl.pathname.startsWith('/settings') ||
+    request.nextUrl.pathname.startsWith('/rules') ||
+    request.nextUrl.pathname.startsWith('/logs')
 
-  if (!user && isProtectedRoute && !isOnboardingPage) {
-    const url = new URL('/login', request.url);
-    const redirectResponse = NextResponse.redirect(url);
-    // Copy cookies from current response to the redirect response
-    response.cookies.getAll().forEach((cookie) => {
-      redirectResponse.cookies.set(cookie.name, cookie.value);
-    });
-    return redirectResponse;
+  if (!user && isProtectedRoute && !request.nextUrl.pathname.startsWith('/onboarding')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    const redirectResponse = NextResponse.redirect(url)
+    // Copy cookies from current supabaseResponse to the redirect response
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value)
+    })
+    return redirectResponse
   }
 
-  if (user && (isHomePage || isSettingsPage || isRulesPage || isLogsPage)) {
-    // Check if user has a username
+  if (user) {
     const { data: profile } = await supabase
       .from('users')
       .select('username')
       .eq('id', user.id)
-      .single();
+      .single()
 
-    if (!profile?.username) {
-      const url = new URL('/onboarding', request.url);
-      const redirectResponse = NextResponse.redirect(url);
-      // Copy cookies from current response to the redirect response
-      response.cookies.getAll().forEach((cookie) => {
-        redirectResponse.cookies.set(cookie.name, cookie.value);
-      });
-      return redirectResponse;
+    const hasUsername = !!profile?.username
+    const isOnboarding = request.nextUrl.pathname.startsWith('/onboarding')
+
+    if (!hasUsername && isProtectedRoute && !isOnboarding) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/onboarding'
+      const redirectResponse = NextResponse.redirect(url)
+      // Copy cookies
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie.name, cookie.value)
+      })
+      return redirectResponse
     }
-  }
 
-  if (user && isOnboardingPage) {
-    // If they already have a username, don't let them go back to onboarding
-    const { data: profile } = await supabase
-      .from('users')
-      .select('username')
-      .eq('id', user.id)
-      .single();
-
-    if (profile?.username) {
-      const url = new URL('/home', request.url);
-      const redirectResponse = NextResponse.redirect(url);
-      // Copy cookies from current response to the redirect response
-      response.cookies.getAll().forEach((cookie) => {
-        redirectResponse.cookies.set(cookie.name, cookie.value);
-      });
-      return redirectResponse;
+    if (hasUsername && isOnboarding) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/home'
+      const redirectResponse = NextResponse.redirect(url)
+      // Copy cookies
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie.name, cookie.value)
+      })
+      return redirectResponse
     }
   }
 
   // Add Vary header to help with downstream proxies (like DigitalOcean's)
-  response.headers.set('Vary', 'Accept');
-  
-  return response;
+  supabaseResponse.headers.set('Vary', 'Accept');
+
+  return supabaseResponse
+}
+
+export async function proxy(request: NextRequest) {
+  return await updateSession(request)
 }
